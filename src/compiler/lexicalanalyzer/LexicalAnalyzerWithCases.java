@@ -1,5 +1,6 @@
 package compiler.lexicalanalyzer;
 
+import compiler.exceptions.*;
 import compiler.token.IToken;
 import compiler.token.Token;
 import sourcemanager.SourceManager;
@@ -43,7 +44,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
     }
 
     @Override
-    public IToken nextToken() {
+    public IToken nextToken() throws IntLiteralLengthException, InvalidSymbolException, UnclosedCommentException, EmptyCharException, UnclosedCharException, TooManyCharException, IllegalUnicodeException, UnclosedStringException {
         restartLexeme();
         States currentState = States.START_STATE;
         while (true) {
@@ -157,7 +158,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             case SourceManager.END_OF_FILE:
                                 return new Token(IToken.TokenType.EOF, "EOF", sourceManager.getLineNumber());
                             default:
-                                //TODO throw exception
+                                //TODO throw exception invalid symbol
                         }
                     }
                     break;
@@ -167,7 +168,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         retrieveNextChar();
                         break;
                     } else if (lexeme.length() > 9) {
-                        //TODO throw exception int too long
+                        throw new IntLiteralLengthException(lexeme, sourceManager.getLineNumber());
                     } else {
                         return new Token(IToken.TokenType.INTLITERAL, lexeme, sourceManager.getLineNumber());
                     }
@@ -220,14 +221,14 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         retrieveNextChar();
                         return new Token(IToken.TokenType.AND, "&&", sourceManager.getLineNumber());
                     } else {
-                        //TODO throw exception
+                        throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber());
                     }
                 case PIPE_STATE:
                     if (currentChar == '|') {
                         retrieveNextChar();
                         return new Token(IToken.TokenType.OR, "||", sourceManager.getLineNumber());
                     } else {
-                        //TODO throw exception
+                        throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber());
                     }
                 case PLUS_STATE:
                     if (currentChar == '+') {
@@ -271,7 +272,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             retrieveNextChar();
                             break;
                         case SourceManager.END_OF_FILE:
-                            //TODO throw exception
+                            throw new UnclosedCommentException("", sourceManager.getLineNumber());
                         default:
                             retrieveNextChar();
                     }
@@ -284,7 +285,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             retrieveNextChar();
                             break;
                         case SourceManager.END_OF_FILE:
-                            //TODO throw exception
+                            throw new UnclosedCommentException("", sourceManager.getLineNumber());
                         default:
                             retrieveNextChar();
                     }
@@ -292,7 +293,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                 case CHAR_LITERAL_STATE:
                     switch (currentChar) {
                         case '\'':
-                            //TODO throw exception empty char
+                            throw new EmptyCharException(lexeme, sourceManager.getLineNumber());
                         case '\\':
                             updateLexeme();
                             currentState = States.SPECIAL_CHAR_STATE;
@@ -300,7 +301,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             break;
                         case SourceManager.END_OF_FILE:
                         case '\n':
-                            //TODO throw exception unclosed char
+                            throw new UnclosedCharException(lexeme, sourceManager.getLineNumber());
                         default:
                             updateLexeme();
                             currentState = States.CHAR_LITERAL_END_STATE;
@@ -312,7 +313,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     switch (currentChar) {
                         case '\n':
                         case SourceManager.END_OF_FILE:
-                            //TODO throw exception unclosed char
+                            throw new UnclosedCharException(lexeme, sourceManager.getLineNumber());
                         case 'u':
                             updateLexeme();
                             currentState = States.UNICODE_CHAR_STATE;
@@ -334,10 +335,10 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             retrieveNextChar();
                             return new Token(IToken.TokenType.CHARLITERAL, lexeme, sourceManager.getLineNumber());
                         } else {
-                            //TODO throw exception too many characters in char literal
+                            throw new TooManyCharException(lexeme, sourceManager.getLineNumber());
                         }
                     } else {
-                        //TODO throw exception illegal unicode escape sequence
+                        throw new IllegalUnicodeException(lexeme, sourceManager.getLineNumber());
                     }
                     break;
                 case CHAR_LITERAL_END_STATE:
@@ -346,9 +347,9 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         retrieveNextChar();
                         return new Token(IToken.TokenType.CHARLITERAL, lexeme, sourceManager.getLineNumber());
                     } else if (currentChar == SourceManager.END_OF_FILE) {
-                        //TODO throw exception
+                        throw new UnclosedCharException(lexeme, sourceManager.getLineNumber());
                     } else {
-                        //TODO throw exception
+                        throw new TooManyCharException(lexeme, sourceManager.getLineNumber());
                     }
                 case STRING_LITERAL_STATE:
                     switch (currentChar) {
@@ -358,7 +359,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             return new Token(IToken.TokenType.STRINGLITERAL, lexeme, sourceManager.getLineNumber());
                         case SourceManager.END_OF_FILE:
                         case '\n':
-                            //TODO throw exception unclosed string
+                            throw new UnclosedStringException(lexeme, sourceManager.getLineNumber());
                         case '\\':
                             updateLexeme();
                             currentState = States.STRING_SPECIAL_CHAR_STATE;
@@ -372,7 +373,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     break;
                 case STRING_SPECIAL_CHAR_STATE:
                     if (currentChar == SourceManager.END_OF_FILE || currentChar == '\n') {
-                        //TODO throw exception unclosed string
+                        throw new UnclosedStringException(lexeme, sourceManager.getLineNumber());
                     } else {
                         updateLexeme();
                         currentState = States.STRING_LITERAL_STATE;
