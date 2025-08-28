@@ -1,7 +1,7 @@
-package compiler;
+package compiler.token;
 
 public interface IToken {
-    public static enum TokenType {
+    enum TokenType {
         METVARID,
         CLASSID,
         INTLITERAL,
@@ -54,7 +54,7 @@ public interface IToken {
         SLASH,
         EOF,
     }
-    public TokenType getTokenType();
-    public String getLexeme();
-    public int getLineNumber();
+    TokenType getTokenType();
+    String getLexeme();
+    int getLineNumber();
 }
