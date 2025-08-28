@@ -2,24 +2,24 @@ package compiler;
 
 public class Token implements IToken {
 
-    private String tokenValue;
     private TokenType tokenType;
+    private String lexeme;
     private int lineNumber;
 
-    public Token(String tokenValue, TokenType tokenType, int lineNumber){
-        this.tokenValue = tokenValue;
+    public Token(TokenType tokenType, String lexeme, int lineNumber){
+        this.lexeme = lexeme;
         this.tokenType = tokenType;
         this.lineNumber = lineNumber;
     }
 
     @Override
-    public String getTokenValue() {
-        return tokenValue;
+    public TokenType getTokenType() {
+        return tokenType;
     }
 
     @Override
-    public TokenType getTokenType() {
-        return tokenType;
+    public String getLexeme() {
+        return lexeme;
     }
 
     @Override
