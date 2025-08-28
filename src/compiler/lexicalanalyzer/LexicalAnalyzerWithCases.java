@@ -46,9 +46,8 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer{
     @Override
     public IToken nextToken() {
         restartLexeme();
-
+        currentState = States.START_STATE;
         while(true){
-            currentState = States.START_STATE;
             switch (currentState){
                 case START_STATE:
                     if(Character.isWhitespace(currentChar)){
@@ -195,7 +194,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer{
                         break;
                     }
                     else{
-                        return new Token(IToken.TokenType.METVARID, lexeme, sourceManager.getLineNumber());
+                        return checkKeyWords();
                     }
                 case LESS_THAN_STATE:
                     if(currentChar == '='){
@@ -403,6 +402,34 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer{
 
             }
         }
+    }
+
+    private Token checkKeyWords() {
+        IToken.TokenType type;
+        type = switch (lexeme) {
+            case "class" -> IToken.TokenType.CLASS_WORD;
+            case "extends" -> IToken.TokenType.EXTENDS_WORD;
+            case "public" -> IToken.TokenType.PUBLIC_WORD;
+            case "static" -> IToken.TokenType.STATIC_WORD;
+            case "void" -> IToken.TokenType.VOID_WORD;
+            case "boolean" -> IToken.TokenType.BOOLEAN_WORD;
+            case "char" -> IToken.TokenType.CHAR_WORD;
+            case "int" -> IToken.TokenType.INT_WORD;
+            case "abstract" -> IToken.TokenType.ABSTRACT_WORD;
+            case "final" -> IToken.TokenType.FINAL_WORD;
+            case "if" -> IToken.TokenType.IF_WORD;
+            case "else" -> IToken.TokenType.ELSE_WORD;
+            case "while" -> IToken.TokenType.WHILE_WORD;
+            case "return" -> IToken.TokenType.RETURN_WORD;
+            case "var" -> IToken.TokenType.VAR_WORD;
+            case "this" -> IToken.TokenType.THIS_WORD;
+            case "new" -> IToken.TokenType.NEW_WORD;
+            case "null" -> IToken.TokenType.NULL_WORD;
+            case "true" -> IToken.TokenType.TRUE_WORD;
+            case "false" -> IToken.TokenType.FALSE_WORD;
+            default -> IToken.TokenType.METVARID;
+        };
+        return new Token(type, lexeme, sourceManager.getLineNumber());
     }
 
     private void restartLexeme() {
