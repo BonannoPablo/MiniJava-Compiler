@@ -4,14 +4,16 @@ import compiler.exceptions.*;
 import compiler.lexicalanalyzer.ILexicalAnalyzer;
 import compiler.lexicalanalyzer.LexicalAnalyzerWithCases;
 import compiler.token.IToken;
+import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
 import sourcemanager.SourceManagerImpl;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        SourceManager sm = new SourceManagerImpl();
+        SourceManager sm = new EfficientSourceManager();
         String filePath = "";
         if (args.length == 1) {
             filePath = args[0];
@@ -33,7 +35,11 @@ public class Main {
             } catch (LexicalException e) {
                 exceptionFLag = true;
                 System.out.println("\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": "+ e.getLexeme() + e.getMessage());
-                System.out.println("Line " + e.getLineNumber() + ": " + sm.getLine());
+                try {
+                    System.out.println("Line " + e.getLineNumber() + ": " + sm.getLine());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 for(int i = 0; i < e.getColumnNumber() + "Line 1:".length()-1; i++){
                     System.out.print(" ");
                 }

@@ -13,7 +13,7 @@ public interface SourceManager {
 
     int getLineNumber();
 
-    String getLine();
+    String getLine() throws IOException;
 
     int getLineIndexNumber();
 
