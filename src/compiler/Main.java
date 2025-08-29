@@ -8,8 +8,6 @@ import sourcemanager.SourceManager;
 import sourcemanager.SourceManagerImpl;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
@@ -32,14 +30,18 @@ public class Main {
             try {
                 token = la.nextToken();
                 System.out.println("(" + token.getLexeme() + ", " + token.getTokenType() + ", " + token.getLineNumber() + ")");
-            } catch (IntLiteralLengthException | InvalidSymbolException | UnclosedCommentException |
-                     EmptyCharException | UnclosedCharException | TooManyCharException | IllegalUnicodeException |
-                     UnclosedStringException e) {
+            } catch (LexicalException e) {
                 exceptionFLag = true;
-                System.out.println("Lexical error in line " + e.getLineNumber() + ": " + e.getLexeme() + e.getMessage());
-                System.out.println("\n[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n");
+                System.out.println("\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": "+ e.getLexeme() + e.getMessage());
+                System.out.println("Line " + e.getLineNumber() + ": " + sm.getLine());
+                for(int i = 0; i < e.getColumnNumber() + "Line 1:".length()-1; i++){
+                    System.out.print(" ");
+                }
+                System.out.println("^");
+                System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n");
+                System.out.println(e.getColumnNumber());
             }
-        } while (Objects.requireNonNull(token).getTokenType() != IToken.TokenType.EOF);
+        } while (token == null || token.getTokenType() != IToken.TokenType.EOF);
         if(!exceptionFLag){
             System.out.println("[SinErrores]");
         }

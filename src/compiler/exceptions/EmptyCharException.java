@@ -1,11 +1,7 @@
 package compiler.exceptions;
 
 public class EmptyCharException extends LexicalException{
-    private static final String message = " Char literal can't be empty";
-
-    public EmptyCharException(String lexemeException, int lineNumber) {
-        super(message, lexemeException, lineNumber);
-    }
+    private static final String message = " -> Char literal can't be empty";
 
     public EmptyCharException(String lexemeException, int lineNumber, int columnNumber) {
         super(message, lexemeException, lineNumber, columnNumber);
