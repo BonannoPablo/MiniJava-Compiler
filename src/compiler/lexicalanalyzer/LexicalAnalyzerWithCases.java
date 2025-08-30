@@ -314,7 +314,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             break;
                         case SourceManager.END_OF_FILE:
                         case '\n':
-                            retrieveNextChar();
                             throw new UnclosedCharException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                         default:
                             updateLexeme();
@@ -362,7 +361,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         updateLexeme();
                         retrieveNextChar();
                         return new Token(IToken.TokenType.CHARLITERAL, lexeme, sourceManager.getLineNumber());
-                    } else if (currentChar == SourceManager.END_OF_FILE) {
+                    } else if (currentChar == SourceManager.END_OF_FILE || currentChar == '\n') {
                         throw new UnclosedCharException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     } else {
                         retrieveNextChar();
@@ -377,7 +376,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         case SourceManager.END_OF_FILE:
                             throw new UnclosedStringException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                         case '\n':
-                            retrieveNextChar();
                             throw new StringLineBreakException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                         case '\\':
                             updateLexeme();
@@ -394,7 +392,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     if (currentChar == SourceManager.END_OF_FILE) {
                         throw new UnclosedStringException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     } else if (currentChar == '\n') {
-                        retrieveNextChar();
                         throw new StringLineBreakException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     } else {
                         updateLexeme();
@@ -405,22 +402,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
 
             }
         }
-    }
-
-    private void retrieveNextCharOutsideStringLiteral() {
-        while (currentChar != '"' && currentChar != SourceManager.END_OF_FILE) {
-            retrieveNextChar();
-        }
-        retrieveNextChar();
-    }
-
-    private void retrieveNextCharOutsideCharLiteral() {
-        while (currentChar != '\'' && currentChar != SourceManager.END_OF_FILE) {
-            updateLexeme();
-            retrieveNextChar();
-        }
-        updateLexeme();
-        retrieveNextChar();
     }
 
     private Token checkKeyWords() {

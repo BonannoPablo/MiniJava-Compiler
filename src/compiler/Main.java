@@ -35,7 +35,7 @@ public class Main {
                 printLexicalException(sourceManager, e);
             }
         } while (token == null || token.getTokenType() != IToken.TokenType.EOF);
-        if(!exceptionFLag){
+        if (!exceptionFLag) {
             System.out.println("[SinErrores]");
         }
     }
@@ -45,18 +45,17 @@ public class Main {
     }
 
     private static void printLexicalException(SourceManager sourceManager, LexicalException e) {
-        System.out.println("\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": "+ e.getLexeme() + e.getMessage());
         try {
+            System.out.println("\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
             System.out.println("Line " + e.getLineNumber() + ": " + sourceManager.getLine());
+            for (int i = 0; i < e.getColumnNumber() + "Line 1:".length() - 1; i++) { //TODO take into consideration the lenght of the line number
+                System.out.print(" ");
+            }
+            System.out.println("^");
+            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n");
         } catch (IOException ex) {
             System.out.println("Error IO"); //TODO print msg
         }
-        for(int i = 0; i < e.getColumnNumber() + "Line 1:".length()-1; i++){ //TODO take into consideration the lenght of the line number
-            System.out.print(" ");
-        }
-        System.out.println("^");
-        System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n");
-        System.out.println(e.getColumnNumber());
     }
 
     private static void openFile(SourceManager sm, String filePath) {

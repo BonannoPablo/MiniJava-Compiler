@@ -1,4 +1,8 @@
 ///[Error:"hola|3]
 
-"hola
-chau"
+"hola CHAU
+
+123
+
+
+"juan"

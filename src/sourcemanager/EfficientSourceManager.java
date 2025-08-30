@@ -65,6 +65,7 @@ public class EfficientSourceManager implements SourceManager {
             lineIndexNumber = 0;
             mustReadNextLine = false;
             currentLine.delete(0, currentLine.length());
+            currentLine.append((char) currentCharInteger);
         } else {
             if(currentCharInteger != '\n')
                 currentLine.append((char) currentCharInteger);
