@@ -299,6 +299,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                             throw new UnclosedCommentException("", sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                         default:
                             retrieveNextChar();
+                            currentState = States.COMMENT_STATE;
                     }
                     break;
                 case CHAR_LITERAL_STATE:
@@ -339,18 +340,22 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     }
                     break;
                 case UNICODE_CHAR_STATE:
-                    if (Character.isDigit(currentChar)) {
+                    if (Character.isDigit(currentChar) || Character.isLetter(currentChar)) {
                         updateLexeme();
                         retrieveNextChar();
                     } else if (currentChar == '\'') {
-                        if (lexeme.length() <= 6) {
+                        if (lexeme.length() == 7) {
                             updateLexeme();
                             retrieveNextChar();
                             return new Token(IToken.TokenType.CHARLITERAL, lexeme, sourceManager.getLineNumber());
-                        } else {
+                        } else  if (lexeme.length() > 7){
                             updateLexeme();
                             retrieveNextChar();
                             throw new TooManyCharException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
+                        } else{
+                            updateLexeme();
+                            retrieveNextChar();
+                            throw new IllegalUnicodeException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                         }
                     } else {
                         throw new IllegalUnicodeException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
