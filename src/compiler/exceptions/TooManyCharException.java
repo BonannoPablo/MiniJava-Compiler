@@ -1,7 +1,7 @@
 package compiler.exceptions;
 
 public class TooManyCharException extends LexicalException{
-    private static final String message = " char literal can't be longer than 1 character";
+    private static final String message = " -> Too many characters in char literal";
 
     public TooManyCharException(String lexemeException, int lineNumber, int columnNumber) {
         super(message, lexemeException, lineNumber, columnNumber);
