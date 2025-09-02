@@ -45,14 +45,14 @@ public class Main {
     }
 
     private static void printLexicalException(SourceManager sourceManager, LexicalException e) {
+        final String RED = "\u001B[31m";
+        final String RESET = "\u001B[0m";
         try {
-            System.out.println("\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
+            System.out.println(RED + "\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
             System.out.println("Line " + e.getLineNumber() + ": " + sourceManager.getLine());
-            for (int i = 0; i < e.getColumnNumber() + "Line 1:".length() - 1; i++) { //TODO take into consideration the lenght of the line number
-                System.out.print(" ");
-            }
+            System.out.print(" ".repeat(e.getColumnNumber() + "Line : ".length() + (e.getLineNumber()/10+1) - 1));
             System.out.println("^");
-            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n");
+            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n" + RESET);
         } catch (IOException ex) {
             System.out.println("Error IO"); //TODO print msg
         }
@@ -63,6 +63,7 @@ public class Main {
             sm.open(filePath);
         } catch (FileNotFoundException e) {
             System.out.println("File " + filePath + " not found");
+            System.exit(1);
         }
     }
 }
