@@ -31,30 +31,6 @@ public class EfficientSourceManager implements SourceManager {
         reader.close();
     }
 
-    @Override
-    /*public char getNextChar() throws IOException {
-        char currentChar;
-
-        if(mustReadNextLine) {
-            currentLine = reader.readLine();
-            lineNumber++;
-            lineIndexNumber = 0;
-            mustReadNextLine = false;
-        }
-
-        if(lineIndexNumber < currentLine.length()) {
-            currentChar = currentLine.charAt(lineIndexNumber);
-            lineIndexNumber++;
-        } else if (reader.ready()) {
-            currentChar = '\n';
-            mustReadNextLine = true;
-        } else {
-            currentChar = END_OF_FILE;
-        }
-
-        return currentChar;
-    }*/
-
     public char getNextChar() throws IOException {
         int currentCharInteger = reader.read();
         if (currentCharInteger == '\r'){
@@ -67,7 +43,7 @@ public class EfficientSourceManager implements SourceManager {
             currentLine.delete(0, currentLine.length());
             currentLine.append((char) currentCharInteger);
         } else {
-            if(currentCharInteger != '\n')
+            if(currentCharInteger != '\n' && currentCharInteger != -1)
                 currentLine.append((char) currentCharInteger);
             lineIndexNumber++;
         }
@@ -82,8 +58,9 @@ public class EfficientSourceManager implements SourceManager {
 
     @Override
     public String getLine() throws IOException {
-        reader.mark(1);
-        String line = mustReadNextLine? currentLine.toString() : currentLine + reader.readLine();
+        reader.mark(8192 );
+        String reminderOfTheLine = reader.readLine();
+        String line = mustReadNextLine? currentLine.toString() : currentLine + (reminderOfTheLine == null ? "" : reminderOfTheLine);
         reader.reset();
         return line;
     }
