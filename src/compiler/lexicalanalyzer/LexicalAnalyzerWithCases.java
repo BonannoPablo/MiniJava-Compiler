@@ -228,8 +228,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         retrieveNextChar();
                         return new Token(IToken.TokenType.AND, "&&", sourceManager.getLineNumber());
                     } else {
-                        updateLexeme();
-                        retrieveNextChar();
                         throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     }
                 case PIPE_STATE:
@@ -237,8 +235,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         retrieveNextChar();
                         return new Token(IToken.TokenType.OR, "||", sourceManager.getLineNumber());
                     } else {
-                        updateLexeme();
-                        retrieveNextChar();
                         throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     }
                 case PLUS_STATE:
@@ -340,7 +336,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     }
                     break;
                 case UNICODE_CHAR_STATE:
-                    if (Character.isDigit(currentChar) || Character.isLetter(currentChar)) {
+                    if (Character.isDigit(currentChar) || 'a' <= currentChar && currentChar <= 'f' || 'A' <= currentChar && currentChar <= 'F') {
                         updateLexeme();
                         retrieveNextChar();
                     } else if (currentChar == '\'') {
