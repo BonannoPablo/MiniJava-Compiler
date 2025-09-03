@@ -17,8 +17,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
         GREATER_THAN_STATE,
         EXCLAMATION_POINT_STATE,
         EQUAL_STATE,
-        AMPERSAND_STATE,
-        PIPE_STATE,
         PLUS_STATE,
         SUBTRACT_STATE,
         SLASH_STATE,
@@ -30,8 +28,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
         CHAR_LITERAL_END_STATE,
         UNICODE_CHAR_STATE,
         STRING_LITERAL_STATE,
-        STRING_SPECIAL_CHAR_STATE,
-        CHAR_ERROR_RECOVERY_STATE,
+        STRING_SPECIAL_CHAR_STATE, UNICODE_CODE_POINT_CHAR_STATE,
     }
 
     private String lexeme;
@@ -49,6 +46,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
     @Override
     public IToken nextToken() throws LexicalException {
         restartLexeme();
+        int unicodeCodePointDigits = 0;
 
         currentState = States.START_STATE;
 
@@ -121,14 +119,22 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                                 break;
                             case '&':
                                 updateLexeme();
-                                currentState = States.AMPERSAND_STATE;
                                 retrieveNextChar();
-                                break;
+                                if (currentChar == '&') {
+                                    retrieveNextChar();
+                                    return new Token(IToken.TokenType.AND, "&&", sourceManager.getLineNumber());
+                                } else {
+                                    throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
+                                }
                             case '|':
                                 updateLexeme();
-                                currentState = States.PIPE_STATE;
                                 retrieveNextChar();
-                                break;
+                                if (currentChar == '|') {
+                                    retrieveNextChar();
+                                    return new Token(IToken.TokenType.OR, "||", sourceManager.getLineNumber());
+                                } else {
+                                    throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
+                                }
                             case '%':
                                 retrieveNextChar();
                                 return new Token(IToken.TokenType.PERCENT, "%", sourceManager.getLineNumber());
@@ -222,20 +228,6 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                         return new Token(IToken.TokenType.EQUALS_COMPARISON, "==", sourceManager.getLineNumber());
                     } else {
                         return new Token(IToken.TokenType.EQUAL, "=", sourceManager.getLineNumber());
-                    }
-                case AMPERSAND_STATE:
-                    if (currentChar == '&') {
-                        retrieveNextChar();
-                        return new Token(IToken.TokenType.AND, "&&", sourceManager.getLineNumber());
-                    } else {
-                        throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
-                    }
-                case PIPE_STATE:
-                    if (currentChar == '|') {
-                        retrieveNextChar();
-                        return new Token(IToken.TokenType.OR, "||", sourceManager.getLineNumber());
-                    } else {
-                        throw new InvalidSymbolException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
                     }
                 case PLUS_STATE:
                     if (currentChar == '+') {
@@ -336,15 +328,28 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     }
                     break;
                 case UNICODE_CHAR_STATE:
+                    if (currentChar == 'u') {
+                        retrieveNextChar();
+                        break;
+                    }
                     if (Character.isDigit(currentChar) || 'a' <= currentChar && currentChar <= 'f' || 'A' <= currentChar && currentChar <= 'F') {
+                        currentState = States.UNICODE_CODE_POINT_CHAR_STATE;
+                        unicodeCodePointDigits++;
+                        updateLexeme();
+                        retrieveNextChar();
+                    }
+                    break;
+                case UNICODE_CODE_POINT_CHAR_STATE:
+                    if (Character.isDigit(currentChar) || 'a' <= currentChar && currentChar <= 'f' || 'A' <= currentChar && currentChar <= 'F') {
+                        unicodeCodePointDigits++;
                         updateLexeme();
                         retrieveNextChar();
                     } else if (currentChar == '\'') {
-                        if (lexeme.length() == 7) {
+                        if (unicodeCodePointDigits == 4) {
                             updateLexeme();
                             retrieveNextChar();
                             return new Token(IToken.TokenType.CHARLITERAL, lexeme, sourceManager.getLineNumber());
-                        } else  if (lexeme.length() > 7){
+                        } else  if (unicodeCodePointDigits > 4){
                             updateLexeme();
                             retrieveNextChar();
                             throw new TooManyCharException(lexeme, sourceManager.getLineNumber(), sourceManager.getLineIndexNumber());
@@ -445,7 +450,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
         try {
             currentChar = sourceManager.getNextChar();
         } catch (IOException e) {
-            throw new RuntimeException(e); //TODO handle exception
+            System.out.println("There has been an error when reading the source file");
         }
     }
 }
