@@ -20,6 +20,11 @@ public class Main {
 
         openFile(sourceManager, filePath);
         runLexicalAnalyzer(sourceManager);
+        try {
+            sourceManager.close();
+        } catch (IOException e) {
+            System.out.println("There has been an error when reading the source file");
+        }
     }
 
     private static void runLexicalAnalyzer(SourceManager sourceManager) {
@@ -50,11 +55,11 @@ public class Main {
         try {
             System.out.println(RED + "\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
             System.out.println("Line " + e.getLineNumber() + ": " + sourceManager.getLine());
-            System.out.print(" ".repeat(e.getColumnNumber() + "Line : ".length() + (e.getLineNumber()/10+1) - 1));
+            System.out.print(" ".repeat(e.getColumnNumber() + "Line : ".length() + (String.valueOf(e.getLineNumber()).length())-1));
             System.out.println("^");
             System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n" + RESET);
         } catch (IOException ex) {
-            System.out.println("Error IO"); //TODO print msg
+            System.out.println("There has been an error when reading the source file");
         }
     }
 
