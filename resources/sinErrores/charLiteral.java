@@ -8,4 +8,8 @@
 
 '\\'
 
-'\u1234'
+'\u12aB'
+
+'\uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuAB12'
+
+'\ua1b2'
