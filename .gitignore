@@ -29,3 +29,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Project ###
+Etapa */
+Etapa *.*
+docs/~*
