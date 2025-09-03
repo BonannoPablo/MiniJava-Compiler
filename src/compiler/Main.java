@@ -37,7 +37,7 @@ public class Main {
                 printToken(token);
             } catch (LexicalException e) {
                 exceptionFLag = true;
-                printLexicalException(sourceManager, e);
+                printLexicalException(e);
             }
         } while (token == null || token.getTokenType() != IToken.TokenType.EOF);
         if (!exceptionFLag) {
@@ -46,21 +46,17 @@ public class Main {
     }
 
     private static void printToken(IToken token) {
-        System.out.println("(" + token.getLexeme() + ", " + token.getTokenType() + ", " + token.getLineNumber() + ")");
+        System.out.println("(" + token.getTokenType() + ", " + token.getLexeme() + ", " + token.getLineNumber() + ")");
     }
 
-    private static void printLexicalException(SourceManager sourceManager, LexicalException e) {
+    private static void printLexicalException(LexicalException e) {
         final String RED = "\u001B[31m";
         final String RESET = "\u001B[0m";
-        try {
-            System.out.println(RED + "\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
-            System.out.println("Line " + e.getLineNumber() + ": " + sourceManager.getLine());
-            System.out.print(" ".repeat(e.getColumnNumber() + "Line : ".length() + (String.valueOf(e.getLineNumber()).length())-1));
-            System.out.println("^");
-            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n" + RESET);
-        } catch (IOException ex) {
-            System.out.println("There has been an error when reading the source file");
-        }
+        System.out.println(RED + "\nLexical error in line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getLexeme() + e.getMessage());
+        System.out.println("Line " + e.getLineNumber() + ": " + e.getLine());
+        System.out.print(" ".repeat(e.getColumnNumber() + "Line : ".length() + (String.valueOf(e.getLineNumber()).length())-1));
+        System.out.println("^");
+        System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]\n" + RESET);
     }
 
     private static void openFile(SourceManager sm, String filePath) {
