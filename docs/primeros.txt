@@ -1,0 +1,72 @@
+Inicial = {abstract, static, final, class, eof}
+ListaClases = {abstract, static, final, class, }
+Clase = {abstract, static, final, class}
+ListaMiembros = {idClase, boolean, char, int, abstract, static, final, void, public, 
+Miembro = {idClase, boolean, char, int, abstract, static, final, void, public}
+AtributoMetodo = {;, (}
+Metodo = {iidMetVar}
+Modificador = {abstract, static, final}
+TipoMetodo = {boolean, char, int, idClase, void}
+Tipo = {boolean, char, int, idClase}
+ArgsFormales = {(}
+ListaArgsFormalesOpcional = {
+ListaArgsFormales =
+ArgFormal =
+BloqueOpcional =
+ListaSentencias =
+Sentencia =
+Asignacion =
+Llamada =
+ExpresionOpcional =
+Expresion =
+ExpresionCompuesta =
+ExpresionBasica =
+Operando =
+Referencia =
+Primario =
+AccesoVar =
+LlamadaMetodo =
+LlamadaMetodoEstatico =
+ListaExpsOpcional = 
+ListaExps = 
+
+
+ModificadorOpcional = {abstract, static, final, }
+HerenciaOpcional = {extends, }
+Constructor = {public}
+TipoPrimitivo = {boolean, char, int}
+Bloque = { { }
+VarLocal = {var}
+Return = {return}
+If = {if}
+Else = {else | }
+While = {while}
+OperadorAsignacion = {=, +=, -=}
+OperadorBinario = {||, &&, ==, °=, <, >, <=, >=, +, -, *, /, %}
+OperadorUnario = {+, ++, -, --, !}
+Primitivo = {ture, false, intLiteral, charLiteral, null}
+LlamadaConstructor = {new}
+ExpresionParentizada = {(}
+ArgsActuales = {(}
+VarEncadenada = {.}
+MetodoEncadenado = {.}
+
+
+
+
+<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> <Metodo> | void <Metodo> | <Constructor>
+<AtributoMetodo> ::= ; | <ArgsFormales> <BloqueOpcional>
+<Metodo> ::=  idMetVar <ArgsFormales> <BloqueOpcional>
+<Modificador> ::= abstract | static | final
+
+
+<AsignacionLlamada> ::= <Expresion>
+
+<If> ::= if( <Expresion> ) <Sentencia> <Else>
+<Else> ::= else <Sentencia> | 
+
+<Expresion> ::= <ExpresionCompuesta> <ExpresionAsignacion>
+<ExpresionAsignacion> ::= <OperadorAsignacion> <ExpresionCompuesta> | 
+
+<Primario> ::= this | stringLiteral | <LlamadaConstructor> | <LlamadaMetodoEstatico> | <ExpresionParentizada> | idMetVar <AccesoVarLlamadaMetodo>
+<AccesoVarLlamadaMetodo> ::= <ArgsActuales> | 

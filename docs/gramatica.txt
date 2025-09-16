@@ -1,0 +1,390 @@
+<Inicial> ::= <ListaClases> eof
+
+<ListaClases> ::= <Clase> <ListaClases> | 
+
+<Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
+
+<ModificadorOpcional> ::= abstract | static | final | 
+
+<HerenciaOpcional> ::= extends idClase | 
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | 
+
+<Miembro> ::= <Atributo> | <Metodo> | <Constructor>                      ###posible ambigüedad
+
+<Atributo> ::= <Tipo> idMetVar ;
+
+<Metodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> <BloqueOpcional>
+
+<Constructor> ::= public idClase <ArgsFormales> <Bloque>
+
+<TipoMetodo> ::= <Tipo> | void
+
+<Tipo> ::= <TipoPrimitivo> | idClase
+
+<TipoPrimitivo> ::= boolean | char | int
+
+<ArgsFormales> ::= ( <ListaArgsFormalesOpcional> )
+
+
+<ListaArgsFormalesOpcional> ::= <ListaArgsFormales> | 
+
+<ListaArgsFormales> ::= <ArgFormal>
+<ListaArgsFormales> ::= <ListaArgsFormales> , <ArgFormal>								#####################3
+
+<ArgFormal> ::= <Tipo> idMetVar
+
+<BloqueOpcional> ::= <Bloque> | ;
+
+<Bloque> ::= { <ListaSentencias> }
+
+<ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
+
+<Sentencia> ::= ;
+<Sentencia> ::= <Asignacion> ;
+<Sentencia> ::= <Llamada> ;
+<Sentencia> ::= <VarLocal> ;
+<Sentencia> ::= <Return> ;
+<Sentencia> ::= <If>
+<Sentencia> ::= <While>
+<Sentencia> ::= <Bloque>
+
+<Asignacion> ::= <Expresion>
+
+<Llamada> ::= <Expresion>
+
+<VarLocal> ::= var idMetVar = <ExpresionCompuesta>
+
+<Return> ::= return <ExpresionOpcional>
+
+<ExpresionOpcional> ::= <Expresion> | 
+
+<If> ::= if ( <Expresion> ) <Sentencia>
+<If> ::= if ( <Expresion> ) <Sentencia> else <Sentencia>
+
+<While> ::= while ( <Expresion> ) <Sentencia>
+
+<Expresion> ::= <ExpresionCompuesta> <OperadorAsignacion> <ExpresionCompuesta>
+<Expresion> ::= <ExpresionCompuesta>
+
+<OperadorAsignacion> ::= = | += | -=
+
+<ExpresionCompuesta> ::= <ExpresionCompuesta> <OperadorBinario> <ExpresionBasica>						############################
+<ExpresionCompuesta> ::= <ExpresionBasica>
+
+<OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
+
+<ExpresionBasica> ::= <OperadorUnario> <Operando>
+<ExpresionBasica> ::= <Operando>
+
+<OperadorUnario> ::= + | ++ | − | −− | !
+
+<Operando> ::= <Primitvo>
+<Operando> ::= <Referencia>
+
+<Primitivo> ::= true | false | intLiteral | charLiteral | null
+
+<Referencia> ::= <Primario>
+<Referencia> ::= <Referencia> <VarEncadenada>														##############################
+<Referencia> ::= <Referencia> <MetodoEncadenado>													##############################
+
+<Primario> ::= this
+<Primario> ::= stringLiteral
+<Primario> ::= <AccesoVar>
+<Primario> ::= <LlamadaConstructor>
+<Primario> ::= <LlamadaMetodo>
+<Primario> ::= <LlamadaMetodoEstatico>
+<Primario> ::= <ExpresionParentizada>
+
+<AccesoVar> ::= idMetVar
+
+<LlamadaConstructor> ::= new idClase <ArgsActuales>
+
+<ExpresionParentizada> ::= ( <Expresion> )
+
+<LlamadaMetodo> ::= idMetVar <ArgsActuales>
+
+<LlamadaMetodoEstatico> ::= idClase . idMetVar <ArgsActuales>
+
+<ArgsActuales> ::= ( <ListaExpsOpcional> )
+
+<ListaExpsOpcional> ::= <ListaExps> | 
+
+<ListaExps> ::= <Expresion>
+<ListaExps> ::= <Expresion> , <ListaExps>
+
+<VarEncadenada> ::= . idMetVar
+
+<MetodoEncadenado> ::= . idMetVar <ArgsActuales>
+
+
+
+
+
+_____________________________________________________
+
+<Referencia> ::= <Primario>
+<Referencia> ::= <Referencia> <VarEncadenada>														##############################
+<Referencia> ::= <Referencia> <MetodoEncadenado>
+
+<Referencia> ::= <Primario> <Referencia2>
+<Referencia2> ::= <VarEncadenada> <Referencia2> | <MetodoEncadenado> <Referencia2> | 
+
+
+
+<ExpresionCompuesta> ::= <ExpresionCompuesta> <OperadorBinario> <ExpresionBasica>						############################
+<ExpresionCompuesta> ::= <ExpresionBasica>
+
+<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
+
+
+
+<ListaArgsFormales> ::= <ArgFormal>
+<ListaArgsFormales> ::= <ListaArgsFormales> , <ArgFormal>
+
+<ListaArgsFormales> ::= <ArgFormal> <ListaArgsFormales2>
+<ListaArgsFormales2> ::= , <ArgFormal> <ListaArgsFormales2> | 
+
+
+
+-----------------------NUEVA GRAMATICA SIN RECURSION -----------------------
+
+<Inicial> ::= <ListaClases> eof
+
+<ListaClases> ::= <Clase> <ListaClases> | 
+
+<Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
+
+<ModificadorOpcional> ::= abstract | static | final | 
+
+<HerenciaOpcional> ::= extends idClase | 
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | 
+
+<Miembro> ::= <Atributo> | <Metodo> | <Constructor>											###ambigüedad entre atributo y metodo
+
+<Atributo> ::= <Tipo> idMetVar ;
+
+<Metodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> <BloqueOpcional>
+
+<Constructor> ::= public idClase <ArgsFormales> <Bloque>
+
+<TipoMetodo> ::= <Tipo> | void
+
+<Tipo> ::= <TipoPrimitivo> | idClase
+
+<TipoPrimitivo> ::= boolean | char | int
+
+<ArgsFormales> ::= ( <ListaArgsFormalesOpcional> )
+
+
+<ListaArgsFormalesOpcional> ::= <ListaArgsFormales> | 
+
+<ListaArgsFormales> ::= <ArgFormal> <ListaArgsFormales2>
+<ListaArgsFormales2> ::= , <ArgFormal> <ListaArgsFormales2> | 							#####################3
+
+<ArgFormal> ::= <Tipo> idMetVar
+
+<BloqueOpcional> ::= <Bloque> | ;
+
+<Bloque> ::= { <ListaSentencias> }
+
+<ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
+
+<Sentencia> ::= ;																
+<Sentencia> ::= <Asignacion> ;													### ambigüedad entre asignacion y llamada
+<Sentencia> ::= <Llamada> ;
+<Sentencia> ::= <VarLocal> ;
+<Sentencia> ::= <Return> ;
+<Sentencia> ::= <If>
+<Sentencia> ::= <While>
+<Sentencia> ::= <Bloque>
+
+<Asignacion> ::= <Expresion>
+
+<Llamada> ::= <Expresion>
+
+<VarLocal> ::= var idMetVar = <ExpresionCompuesta>
+
+<Return> ::= return <ExpresionOpcional>
+
+<ExpresionOpcional> ::= <Expresion> | 
+
+<If> ::= if ( <Expresion> ) <Sentencia>														#### ambigüedad
+<If> ::= if ( <Expresion> ) <Sentencia> else <Sentencia>
+
+<While> ::= while ( <Expresion> ) <Sentencia>
+
+<Expresion> ::= <ExpresionCompuesta> <OperadorAsignacion> <ExpresionCompuesta>				####ambigüedad
+<Expresion> ::= <ExpresionCompuesta>
+
+<OperadorAsignacion> ::= = | += | -=
+
+<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
+
+<OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
+
+<ExpresionBasica> ::= <OperadorUnario> <Operando>
+<ExpresionBasica> ::= <Operando>
+
+<OperadorUnario> ::= + | ++ | − | −− | !
+
+<Operando> ::= <Primitvo>
+<Operando> ::= <Referencia>
+
+<Primitivo> ::= true | false | intLiteral | charLiteral | null
+
+<Referencia> ::= <Primario> <Referencia2>
+<Referencia2> ::= <VarEncadenada> <Referencia2> | <MetodoEncadenado> <Referencia2> | 
+
+<Primario> ::= this
+<Primario> ::= stringLiteral
+<Primario> ::= <AccesoVar>														#### ambigüedad con llamadaMetodo
+<Primario> ::= <LlamadaConstructor>
+<Primario> ::= <LlamadaMetodo>
+<Primario> ::= <LlamadaMetodoEstatico>
+<Primario> ::= <ExpresionParentizada>
+
+<AccesoVar> ::= idMetVar
+
+<LlamadaConstructor> ::= new idClase <ArgsActuales>
+
+<ExpresionParentizada> ::= ( <Expresion> )
+
+<LlamadaMetodo> ::= idMetVar <ArgsActuales>
+
+<LlamadaMetodoEstatico> ::= idClase . idMetVar <ArgsActuales>
+
+<ArgsActuales> ::= ( <ListaExpsOpcional> )
+
+<ListaExpsOpcional> ::= <ListaExps> | 
+
+<ListaExps> ::= <Expresion>													### ambigüedad
+<ListaExps> ::= <Expresion> , <ListaExps>
+
+<VarEncadenada> ::= . idMetVar
+
+<MetodoEncadenado> ::= . idMetVar <ArgsActuales>
+
+
+
+
+
+
+--------------------------------------GRAMATICA LL(1) (CREO) ------------------------
+
+<Inicial> ::= <ListaClases> eof
+
+<ListaClases> ::= <Clase> <ListaClases> | 
+
+<Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
+
+<Modificador> ::= abstract | static | final
+
+<ModificadorOpcional> ::= <Modificador> | 
+
+<HerenciaOpcional> ::= extends idClase | 
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | 
+
+<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> <Metodo> | void <Metodo> | <Constructor>
+
+<AtributoMetodo> ::= ; | <ArgsFormales> <BloqueOpcional>
+
+<Metodo> ::=  idMetVar <ArgsFormales> <BloqueOpcional>
+
+<Constructor> ::= public idClase <ArgsFormales> <Bloque>
+
+<TipoMetodo> ::= <Tipo> | void
+
+<Tipo> ::= <TipoPrimitivo> | idClase
+
+<TipoPrimitivo> ::= boolean | char | int
+
+<ArgsFormales> ::= ( <ListaArgsFormalesOpcional> )
+
+
+<ListaArgsFormalesOpcional> ::= <ListaArgsFormales> | 
+
+<ListaArgsFormales> ::= <ArgFormal> <ListaArgsFormales2>
+<ListaArgsFormales2> ::= , <ArgFormal> <ListaArgsFormales2> | 							#####################3
+
+<ArgFormal> ::= <Tipo> idMetVar
+
+<BloqueOpcional> ::= <Bloque> | ;
+
+<Bloque> ::= { <ListaSentencias> }
+
+<ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
+
+<Sentencia> ::= ;																
+<Sentencia> ::= <AsignacionLlamada> ;													### ambigüedad entre asignacion y llamada
+<Sentencia> ::= <VarLocal> ;
+<Sentencia> ::= <Return> ;
+<Sentencia> ::= <If>
+<Sentencia> ::= <While>
+<Sentencia> ::= <Bloque>
+
+<AsignacionLlamada> ::= <Expresion>
+
+<VarLocal> ::= var idMetVar = <ExpresionCompuesta>
+
+<Return> ::= return <ExpresionOpcional>
+
+<ExpresionOpcional> ::= <Expresion> | 
+
+<If> ::= if( <Expresion> ) <Sentencia> <Else>
+<Else> ::= else <Sentencia> | 
+
+<While> ::= while ( <Expresion> ) <Sentencia>
+
+<Expresion> ::= <ExpresionCompuesta> <ExpresionAsignacion>
+<ExpresionAsignacion> ::= <OperadorAsignacion> <ExpresionCompuesta> | 
+
+<OperadorAsignacion> ::= = | += | -=
+
+<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
+
+<OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
+
+<ExpresionBasica> ::= <OperadorUnario> <Operando>
+<ExpresionBasica> ::= <Operando>
+
+<OperadorUnario> ::= + | ++ | − | −− | !
+
+<Operando> ::= <Primitvo>
+<Operando> ::= <Referencia>
+
+<Primitivo> ::= true | false | intLiteral | charLiteral | null
+
+<Referencia> ::= <Primario> <Referencia2>
+<Referencia2> ::= <VarEncadenada> <Referencia2> | <MetodoEncadenado> <Referencia2> | 
+
+<Primario> ::= this
+<Primario> ::= stringLiteral
+<Primario> ::= idMetVar <AccesoVarLlamadaMetodo>														#### ambigüedad con llamadaMetodo
+<Primario> ::= <LlamadaConstructor>
+<Primario> ::= <LlamadaMetodoEstatico>
+<Primario> ::= <ExpresionParentizada>
+
+<AccesoVarLlamadaMetodo> ::= <ArgsActuales> | 
+
+<LlamadaConstructor> ::= new idClase <ArgsActuales>
+
+<ExpresionParentizada> ::= ( <Expresion> )
+
+<LlamadaMetodoEstatico> ::= idClase . idMetVar <ArgsActuales>
+
+<ArgsActuales> ::= ( <ListaExpsOpcional> )
+
+<ListaExpsOpcional> ::= <ListaExps> | 
+
+<ListaExps> ::= <Expresion>													### ambigüedad
+<ListaExps> ::= <Expresion> , <ListaExps>
+
+<VarEncadenada> ::= . idMetVar
+
+<MetodoEncadenado> ::= . idMetVar <ArgsActuales>
