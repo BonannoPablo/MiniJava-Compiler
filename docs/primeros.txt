@@ -1,16 +1,10 @@
 Inicial = {abstract, static, final, class, eof}
-ListaClases = {abstract, static, final, class, }
 Clase = {abstract, static, final, class}
-ListaMiembros = {idClase, boolean, char, int, abstract, static, final, void, public, 
 Miembro = {idClase, boolean, char, int, abstract, static, final, void, public}
 AtributoMetodo = {;, (}
 Metodo = {iidMetVar}
-Modificador = {abstract, static, final}
 TipoMetodo = {boolean, char, int, idClase, void}
-Tipo = {boolean, char, int, idClase}
-ArgsFormales = {(}
 ListaArgsFormalesOpcional = {
-ListaArgsFormales =
 ArgFormal =
 BloqueOpcional =
 ListaSentencias =
@@ -27,15 +21,12 @@ Primario =
 AccesoVar =
 LlamadaMetodo =
 LlamadaMetodoEstatico =
-ListaExpsOpcional = 
-ListaExps = 
+ListaExpsOpcional =
+ListaExps =
 
 
-ModificadorOpcional = {abstract, static, final, }
 HerenciaOpcional = {extends, }
-Constructor = {public}
 TipoPrimitivo = {boolean, char, int}
-Bloque = { { }
 VarLocal = {var}
 Return = {return}
 If = {if}
@@ -50,6 +41,29 @@ ExpresionParentizada = {(}
 ArgsActuales = {(}
 VarEncadenada = {.}
 MetodoEncadenado = {.}
+
+
+ListaClases = {abstract, static, final, class, }
+ModificadorOpcional = {abstract, static, final, }
+ListaMiembros = {idClase, boolean, char, int, abstract, static, final, void, public, 
+Tipo = {boolean, char, int, idClase}
+Modificador = {abstract, static, final}
+Constructor = {public}
+ArgsFormales = {(}
+ListaArgsFormales = {boolean, char, int, idClase}
+ArgFormal = {boolean, char, int, idClase}
+Bloque = { { }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

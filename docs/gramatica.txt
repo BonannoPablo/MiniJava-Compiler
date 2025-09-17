@@ -382,8 +382,8 @@ _____________________________________________________
 
 <ListaExpsOpcional> ::= <ListaExps> | 
 
-<ListaExps> ::= <Expresion>													### ambigüedad
-<ListaExps> ::= <Expresion> , <ListaExps>
+<ListaExps> ::= <Expresion>	<ListaExps2>												### ambigüedad
+<ListaExps2> ::= , <Expresion> <ListaExps2> | 
 
 <VarEncadenada> ::= . idMetVar
 
