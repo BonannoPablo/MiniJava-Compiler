@@ -25,15 +25,15 @@ public class SyntacticAnalyzer{
     }
 
     private void classList() throws LexicalException{
-        if(firstMap.get("classList").contains(currentToken.getTokenType())){
-            classNT();
+        if(firstMap.get("classStatement").contains(currentToken.getTokenType())){
+            classStatement();
             classList();
         } else {
             match(IToken.TokenType.EOF);
         }
     }
 
-    private void classNT() throws LexicalException {
+    private void classStatement() throws LexicalException {
         optionalModifier();
         match(IToken.TokenType.CLASS_WORD);
         match(IToken.TokenType.CLASSID);
@@ -471,6 +471,17 @@ public class SyntacticAnalyzer{
     private void LoadFirstMap() {
         firstMap = new HashMap<>();
 
+    }
+
+    private Set<IToken.TokenType> first(String productionName) {
+        switch (productionName) {
+            case "classList":
+                return first("classStatement");
+            case "classStatement":
+                Set < IToken.TokenType> set = first("optionalModifier");
+                set.add((IToken.TokenType.CLASS_WORD));
+                return set;
+        }
     }
 
 
