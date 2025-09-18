@@ -3,7 +3,6 @@ package compiler;
 import compiler.exceptions.*;
 import compiler.lexicalanalyzer.ILexicalAnalyzer;
 import compiler.lexicalanalyzer.LexicalAnalyzerWithCases;
-import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.token.IToken;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
@@ -11,33 +10,21 @@ import sourcemanager.SourceManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Main {
-    public static void main(String[] args) {
+public class MainLexical {
+    public static void main2(String[] args) {
         if (args.length != 1)
             throw new RuntimeException("Invalid number of arguments. Must specify the source code file path to compile.");
 
-        String filePath = args[0];
         SourceManager sourceManager = new EfficientSourceManager();
-        openFile(sourceManager, filePath);
-        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(new LexicalAnalyzerWithCases(sourceManager));
+        String filePath = args[0];
 
-        boolean exceptionFlag = false;
-        try{
-            syntacticAnalyzer.start();
-        } catch(LexicalException e){
-            printLexicalException(e);
-        } catch(SyntacticException e){
-            exceptionFlag = true;
-            System.out.println(e.getMessage());
-            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]");
-        }
-        if(!exceptionFlag) System.out.println("[SinErrores]");
+        openFile(sourceManager, filePath);
+        runLexicalAnalyzer(sourceManager);
         try {
             sourceManager.close();
         } catch (IOException e) {
             System.out.println("There has been an error when reading the source file");
         }
-
     }
 
     private static void runLexicalAnalyzer(SourceManager sourceManager) {
@@ -56,8 +43,6 @@ public class Main {
         if (!exceptionFLag) {
             System.out.println("[SinErrores]");
         }
-
-
     }
 
     private static void printToken(IToken token) {

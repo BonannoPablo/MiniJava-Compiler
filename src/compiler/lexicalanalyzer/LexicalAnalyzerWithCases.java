@@ -167,7 +167,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                                 retrieveNextChar();
                                 break;
                             case SourceManager.END_OF_FILE:
-                                return new Token(IToken.TokenType.EOF, "EOF", sourceManager.getLineNumber());
+                                return new Token(IToken.TokenType.EOF, "", sourceManager.getLineNumber());
                             default:
                                 updateLexeme();
                                 retrieveNextChar();
@@ -258,6 +258,9 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                     }
                     break;
                 case LINE_COMMENT_STATE:
+                    if (currentChar == SourceManager.END_OF_FILE) {
+                        return new Token(IToken.TokenType.EOF, "", sourceManager.getLineNumber());
+                    }
                     if (currentChar == '\n') {
                         currentState = States.START_STATE;
                         restartLexeme();

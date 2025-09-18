@@ -1,0 +1,3 @@
+///[Error:|3]
+
+'a'  /* this comment will explode in 3, 2, 1...

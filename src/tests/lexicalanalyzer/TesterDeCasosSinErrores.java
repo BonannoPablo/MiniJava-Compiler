@@ -1,4 +1,4 @@
-package tests;
+package tests.lexicalanalyzer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

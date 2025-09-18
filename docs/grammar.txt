@@ -1,0 +1,114 @@
+LL(1) grammar
+
+<Start> ::= <ClassList> eof
+
+<ClassList> ::= <ClassStatement> <ClassList> | 
+
+<ClassStatement> ::= <OptionalModifier> class idClass <OptionalInheritance> { <MemberList> }
+
+<Modifier> ::= abstract | static | final
+<OptionalModifier> ::= <Modifier> | 
+
+<OptionalInheritance> ::= extends idClass | 
+
+<MemberList> ::= <Member> <MemberList> | 
+
+<Member> ::= <Type> idMetVar <AttributeMethod> | <Modifier> <MethodType> <Method> | void <Method> | <Constructor>
+
+<AttributeMethod> ::= ; | <FormalArgs> <OptionalBlock>
+
+<Method> ::= idMetVar <FormalArgs> <OptionalBlock>
+
+<Constructor> ::= public idClass <FormalArgs> <Block>
+
+<MethodType> ::= <Type> | void
+
+<Type> ::= <PrimitiveType> | idClass
+
+<PrimitiveType> ::= boolean | char | int
+
+<FormalArgs> ::= ( <OptionalFormalArgsList> )
+
+<OptionalFormalArgsList> ::= <FormalArgsList> | 
+
+<FormalArgsList> ::= <FormalArg> <FormalArgsList2>
+<FormalArgsList2> ::= , <FormalArg> <FormalArgsList2> | 
+
+<FormalArg> ::= <Type> idMetVar
+
+<OptionalBlock> ::= <Block> | ;
+
+<Block> ::= { <SentenceList> }
+
+<SentenceList> ::= <Sentence> <SentenceList> | 
+
+<Sentence> ::= ;
+<Sentence> ::= <AssignmentCall> ;
+<Sentence> ::= <LocalVar> ;
+<Sentence> ::= <ReturnSentence> ;
+<Sentence> ::= <IfSentence>
+<Sentence> ::= <WhileSentence>
+<Sentence> ::= <Block>
+
+<AssignmentCall> ::= <Expression>
+
+<LocalVar> ::= var idMetVar = <CompoundExpression>
+
+<ReturnSentence> ::= return <OptionalExpression>
+
+<OptionalExpression> ::= <Expression> | 
+
+<IfSentence> ::= if ( <Expression> ) <Sentence> <ElseSentence>
+<ElseSentence> ::= else <Sentence> | 
+
+<WhileSentence> ::= while ( <Expression> ) <Sentence>
+
+<Expression> ::= <CompoundExpression> <AssignmentExpression>
+
+<AssignmentExpression> ::= <AssignmentOperator> <CompoundExpression> | 
+
+<AssignmentOperator> ::= =
+
+<CompoundExpression> ::= <BasicExpression> <CompounExpression2>
+<CompounExpression2> ::= <BinaryOperator> <BasicExpression> <CompounExpression2> | 
+
+<BinaryOperator> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
+
+<BasicExpression> ::= <UnaryOperator> <Operand>
+<BasicExpression> ::= <Operand>
+
+<UnaryOperator> ::= + | ++ | - | -- | !
+
+<Operand> ::= <Primitive>
+<Operand> ::= <Reference>
+
+<Primitive> ::= true | false | intLiteral | charLiteral | null
+
+<Reference> ::= <Primary> <Reference2>
+<Reference2> ::= <ChainedMetVar> <Reference2> | 
+
+<Primary> ::= this
+<Primary> ::= stringLiteral
+<Primary> ::= idMetVar <VarAccessMethodCall>
+<Primary> ::= <ConstructorCall>
+<Primary> ::= <StaticMethodCall>
+<Primary> ::= <ParenthesizedExpression>
+
+<VarAccessMethodCall> ::= <ActualArgs> | 
+
+<ConstructorCall> ::= new idClass <ActualArgs>
+
+<ParenthesizedExpression> ::= ( <Expression> )
+
+<StaticMethodCall> ::= idClass . idMetVar <ActualArgs>
+
+<ActualArgs> ::= ( <OptionalExpressionList> )
+
+<OptionalExpressionList> ::= <ExpressionList> | 
+
+<ExpressionList> ::= <Expression> <ExpressionList2>
+<ExpressionList2> ::= , <Expression> <ExpressionList2> | 
+
+<ChainedMetVar> ::= . idMetVar <OptionalActualArgs>
+
+<OptionalActualArgs> ::= <ActualArgs> | 

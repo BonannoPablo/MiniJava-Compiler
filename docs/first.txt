@@ -1,0 +1,114 @@
+
+
+F(Start) = F(ClassList) U eof
+
+F(ClassList) = F(ClassStatement)
+
+F(ClassStatement) = F(OptionalModifier) U {class}
+
+F(Modifier) = {abstract | static | final}
+F(OptionalModifier) = F(Modifier) U {}
+
+F(OptionalInheritance) = {extends U }
+
+F(MemberList) = F(Member) U {}
+
+F(Member) = F(Type) U F(Modifier) U {void} U F(Constructor)
+
+F(AttributeMethod) = {;} U F(FormalArgs)
+
+F(Method) = {idMetVar}
+
+F(Constructor) = {public}
+
+F(MethodType) = F(Type) U {void}
+
+F(Type) = F(PrimitiveType) U {idClass}
+
+F(PrimitiveType) = {boolean, char, int}
+
+F(FormalArgs) = {(}
+
+F(OptionalFormalArgsList) = F(FormalArgsList) U {}
+
+F(FormalArgsList) = F(FormalArg)
+F(FormalArgsList2) = {,}
+
+F(FormalArg) = F(Type)
+
+F(OptionalBlock) = F(Block) U {;}
+
+F(Block) = { { }
+
+F(SentenceList) = F(Sentence) U {}
+
+F(Sentence)= {;} U F(AssignmentCall) U F(LocalVar) U F(ReturnSentence) U
+				F(IfSentence) U F(WhileSentence) U F(Block)
+
+
+
+
+
+
+F(AssignmentCall) = F(Expression)
+
+F(LocalVar) = {var}
+
+F(ReturnSentence) = {return}
+
+F(OptionalExpression) = F(Expression) U {}
+
+F(IfSentence) = {if}
+F(ElseSentence) = {else, }
+
+F(WhileSentence) = {while}
+
+F(Expression) = F(CompounExpression)
+
+F(AssignmentExpression) = F(AssignmentOperator) U {}
+
+F(AssignmentOperator) = {=}
+
+F(CompounExpression) = F(BasicExpression)
+F(CompounExpression2) = F(BinaryOperator)
+
+F(BinaryOperator) = {||, &&, ==, !=, <, > , <=, >=, +, -, *, /, %}
+
+F(BasicExpression) = F(UnaryOperator) U F(Operand)
+
+
+F(UnaryOperator) = {+, ++, -, --, !}
+
+F(Operand) = F(Primitive) U F(Reference)
+
+
+F(Primitive) = {true, false, intLiteral, charLiteral, null}
+
+F(Reference) = F(Primary)
+F(Reference2) = (ChainedVarMethod) U {}
+
+F(Primary) = {this, stringLiteral, idMetVar} U F(ConstructorCall) U F(StaticMethodCall) U F(ParenthesizedExpression)
+
+
+
+
+
+
+F(VarAccesMethodCall) = F(ActualArgs) U {}
+
+F(ConstructorCall) = {new}
+
+F(ParenthesizedExpression) = {(}
+
+F(StaticMethodCall) = {ifClass}
+
+F(ActualArgs) = {(}
+
+F(OptionalExpressionList) = F(ExpressionList) U {}
+
+F(ExpressionList) = F(Expression)
+F(ExpressionList2) = {,}
+
+F(ChainedMetodVar) = {.}
+
+F(optionalActualArgs) = first(actualArgs)
