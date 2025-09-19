@@ -395,23 +395,19 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 
 <Inicial> ::= <ListaClasesEInterfaces> eof
 
-<ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | <Interfaz> <ListaClasesEInterfaces> | 
+<ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | 
 
 <Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
 
-<Interfaz> ::= <ModificadorOpcional> interface idClase <ExtendsOpcional> { <ListaMiembrosInterfaz> }
+<Interfaz> ::= #NO SE QUE MODIFICADORES TIENE INTERFAZ#  interface idClase <ExtendsOpcional> { <ListaDeclaraciones> }
+<ListaDeclaraciones> ::= <Declaracion> <ListaDeclaraciones> | 
+<Declaracion> ::= <DeclAtributo> | <DeclMetodo>
+<DeclAtributo> ::= <
 
 <ModificadorOpcional> ::= abstract | static | final | 
 
-<HerenciaOpcional> ::= <ExtendsOpcional>  | implements idClase
+<HerenciaOpcional> ::= extends idClase | implements idClase | 
 <ExtendsOpcional> ::= extends idClase | 
-
-<ListaMiembrosInterfaz> ::= <MiembroInterfaz> <ListaMiembrosInterfaz> | 
-
-<MiembroInterfaz> ::= <AtributoInicializado> | <DeclaracionMetodo>
-<AtributoInicializado> ::= <Tipo> idMetVar = <Expresion> ;
-<DeclaracionMetodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> ;
-
 
 <ListaMiembros> ::= <Miembro> <ListaMiembros> | 
 
@@ -457,8 +453,8 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 <Sentencia> ::= <Bloque>
 <Sentencia> ::= <For>
 
-<For> ::= for ( <ForControl> ) <Sentencia>
-<ForControl> ::= <VarLocal> ; <Expresion> ; <Expresion>                                   ####  TODO Va sentencia acá?? 
+<For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)
+ <CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
 
 <Asignacion> ::= <Expresion>
 
@@ -480,7 +476,7 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 
 <OperadorAsignacion> ::= = | += | -=
 
-<ExpresionCompuesta> ::= <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
 <ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
 
 <OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
@@ -527,3 +523,27 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 
 <MetodoEncadenado> ::= . idMetVar <ArgsActuales>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<public> <abstract> interface nombreInterfaz{
+	<public> static tipo nombre(<args>) bloque
+	<public> <abstract> tipo nombre (<args>);
+	<public> <final|static> tipo arg = expresion;
+}
