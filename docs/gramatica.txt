@@ -393,15 +393,21 @@ _____________________________________________________
 
 __________________________________Gramatica sin recursiones, con ambigüedades pero permitiendo inicializar variables y atributos____________________________________________________
 
-<Inicial> ::= <ListaClases> eof
+<Inicial> ::= <ListaClasesEInterfaces> eof
 
-<ListaClases> ::= <Clase> <ListaClases> | 
+<ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | 
 
 <Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
 
+<Interfaz> ::= #NO SE QUE MODIFICADORES TIENE INTERFAZ#  interface idClase <ExtendsOpcional> { <ListaDeclaraciones> }
+<ListaDeclaraciones> ::= <Declaracion> <ListaDeclaraciones> | 
+<Declaracion> ::= <DeclAtributo> | <DeclMetodo>
+<DeclAtributo> ::= <
+
 <ModificadorOpcional> ::= abstract | static | final | 
 
-<HerenciaOpcional> ::= extends idClase | 
+<HerenciaOpcional> ::= extends idClase | implements idClase | 
+<ExtendsOpcional> ::= extends idClase | 
 
 <ListaMiembros> ::= <Miembro> <ListaMiembros> | 
 
@@ -445,6 +451,10 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 <Sentencia> ::= <If>
 <Sentencia> ::= <While>
 <Sentencia> ::= <Bloque>
+<Sentencia> ::= <For>
+
+<For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)
+ <CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion> 
 
 <Asignacion> ::= <Expresion>
 
@@ -513,3 +523,27 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 
 <MetodoEncadenado> ::= . idMetVar <ArgsActuales>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<public> <abstract> interface nombreInterfaz{
+	<public> static tipo nombre(<args>) bloque
+	<public> <abstract> tipo nombre (<args>);
+	<public> <final|static> tipo arg = expresion;
+}
