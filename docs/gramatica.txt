@@ -393,15 +393,25 @@ _____________________________________________________
 
 __________________________________Gramatica sin recursiones, con ambigüedades pero permitiendo inicializar variables y atributos____________________________________________________
 
-<Inicial> ::= <ListaClases> eof
+<Inicial> ::= <ListaClasesEInterfaces> eof
 
-<ListaClases> ::= <Clase> <ListaClases> | 
+<ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | <Interfaz> <ListaClasesEInterfaces> | 
 
 <Clase> ::= <ModificadorOpcional> class idClase <HerenciaOpcional> { <ListaMiembros> }
 
+<Interfaz> ::= <ModificadorOpcional> interface idClase <ExtendsOpcional> { <ListaMiembrosInterfaz> }
+
 <ModificadorOpcional> ::= abstract | static | final | 
 
-<HerenciaOpcional> ::= extends idClase | 
+<HerenciaOpcional> ::= <ExtendsOpcional>  | implements idClase
+<ExtendsOpcional> ::= extends idClase | 
+
+<ListaMiembrosInterfaz> ::= <MiembroInterfaz> <ListaMiembrosInterfaz> | 
+
+<MiembroInterfaz> ::= <AtributoInicializado> | <DeclaracionMetodo>
+<AtributoInicializado> ::= <Tipo> idMetVar = <Expresion> ;
+<DeclaracionMetodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> ;
+
 
 <ListaMiembros> ::= <Miembro> <ListaMiembros> | 
 
@@ -445,6 +455,10 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 <Sentencia> ::= <If>
 <Sentencia> ::= <While>
 <Sentencia> ::= <Bloque>
+<Sentencia> ::= <For>
+
+<For> ::= for ( <ForControl> ) <Sentencia>
+<ForControl> ::= <VarLocal> ; <Expresion> ; <Expresion>                                   ####  TODO Va sentencia acá?? 
 
 <Asignacion> ::= <Expresion>
 
@@ -466,7 +480,7 @@ __________________________________Gramatica sin recursiones, con ambigüedades p
 
 <OperadorAsignacion> ::= = | += | -=
 
-<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta> ::= <ExpresionBasica> <ExpresionCompuesta2>
 <ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
 
 <OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
