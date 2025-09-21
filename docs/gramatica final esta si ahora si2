@@ -7,6 +7,7 @@
 <Interfaz> ::= interface idClase <GenericidadOpcional> <ExtendsOpcional> { <ListaMiembrosInterfaz> }
 
 <ModificadorOpcional> ::= abstract | static | final | 
+<Modificador> ::= abstract | static | final
 <VisibilidadOpcional> ::= public | private | 
 
 <HerenciaOpcional> ::= extends idClase <GenericidadOpcional>| implements idClase <GenericidadOpcional>| 
@@ -34,7 +35,7 @@
 <Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> <Metodo> | void <Metodo> | <Constructor>
 <AtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormales> <BloqueOpcional>
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
-
+<Metodo> ::= idClase <ArgsFormalesYBloqueOpcional>
 
 <Constructor> ::= public idClase <ArgsFormales> <Bloque>
 
