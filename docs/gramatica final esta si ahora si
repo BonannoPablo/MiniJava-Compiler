@@ -1,0 +1,135 @@
+<Inicial> ::= <ListaClasesEInterfaces> eof
+
+<ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | <Interfaz> <ListaClasesEInterfaces> | 
+
+<Clase> ::= <ModificadorOpcional> class idClase <GenericidadOpcional> <HerenciaOpcional> { <ListaMiembros> }
+<Interfaz> ::= <ModificadorOpcional> interface idClase <GenericidadOpcional> <ExtendsOpcional> { <ListaMiembrosInterfaz> }
+
+<ModificadorOpcional> ::= abstract | static | final | 
+
+<HerenciaOpcional> ::= extends idClase <GenericidadOpcional>| implements idClase <GenericidadOpcional>| 
+<ExtendsOpcional> ::= extends idClase <GenericidadOpcional>| 
+
+<GenericidadODiamanteOpcional> ::= <GenericidadOpcional> | <>
+<GenericidadOpcional> ::= <  idClase  > | 
+
+<ListaMiembros> ::= <VisibilidadOpcional> <Miembro> <ListaMiembros> | 
+<ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
+
+<Miembro> ::= <Atributo> | <Metodo> | <Constructor>                      ###posible ambigüedad
+<MiembroInterfaz> ::= <AtributoInicializado> | <Metodo>
+
+<Atributo> ::= <Tipo> idMetVar <AsignacionOpcional> ;										### ahora se puede inicializar el atributo
+<AsignacionOpcional> ::=   =   <Expresion> | 
+<AtributoInicializado> ::= <Tipo> idMetVar = <Expresion> ;
+
+<Metodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> <BloqueOpcional>
+
+<Constructor> ::= public idClase <ArgsFormales> <Bloque>
+
+<TipoMetodo> ::= <Tipo> | void
+
+<Tipo> ::= <TipoPrimitivo> | idClase <GenericidadOpcional>
+
+<TipoPrimitivo> ::= boolean | char | int
+
+<ArgsFormales> ::= ( <ListaArgsFormalesOpcional> )
+
+
+<ListaArgsFormalesOpcional> ::= <ListaArgsFormales> | 
+
+<ListaArgsFormales> ::= <ArgFormal>
+<ListaArgsFormales> ::= <ListaArgsFormales> , <ArgFormal>								#####################3
+
+<ArgFormal> ::= <Tipo> idMetVar
+
+<BloqueOpcional> ::= <Bloque> | ;
+
+<Bloque> ::= { <ListaSentencias> }
+
+<ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
+
+<Sentencia> ::= ;
+<Sentencia> ::= <Asignacion> ;
+<Sentencia> ::= <Llamada> ;
+<Sentencia> ::= <VarLocal> ;
+<Sentencia> ::= <Return> ;
+<Sentencia> ::= <If>
+<Sentencia> ::= <While>
+<Sentencia> ::= <Bloque>
+<Sentencia> ::= <For>
+
+<For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)
+<CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
+
+<Asignacion> ::= <Expresion>
+
+<Llamada> ::= <Expresion>
+
+<VarLocal> ::= var idMetVar = <ExpresionCompuesta> ; | <Tipo> idMetVar <DeclaracionMultiple> <AsignacionOpcional> ;
+<DeclaracionMultiple> ::= , idMetVar <DeclaracionMultiple> | 
+
+<Return> ::= return <ExpresionOpcional>
+
+<ExpresionOpcional> ::= <Expresion> | 
+
+<If> ::= if ( <Expresion> ) <Sentencia>
+<If> ::= if ( <Expresion> ) <Sentencia> else <Sentencia>
+
+<While> ::= while ( <Expresion> ) <Sentencia>
+
+<Expresion> ::= <ExpresionCompuesta> <OperadorAsignacion> <ExpresionCompuesta> <OperadorTernarioOpcional>
+<Expresion> ::= <ExpresionCompuesta> <OperadorTernarioOpcional>
+
+<OperadorTernarioOpcional> ::=  ? <Expresion> : <ExpresionCompuesta> <OperadorTernarioOpcional> | 
+
+<OperadorAsignacion> ::= = | += | -=
+
+<ExpresionCompuesta> ::= <ExpresionCompuesta> <OperadorBinario> <ExpresionBasica>						############################
+<ExpresionCompuesta> ::= <ExpresionBasica>
+
+
+<OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %
+
+<ExpresionBasica> ::= <OperadorUnario> <Operando>
+<ExpresionBasica> ::= <Operando>
+
+<OperadorUnario> ::= + | ++ | − | −− | !
+
+<Operando> ::= <Primitivo>
+<Operando> ::= <Referencia>
+
+<Primitivo> ::= true | false | intLiteral | charLiteral | null
+
+<Referencia> ::= <Primario>
+<Referencia> ::= <Referencia> <VarEncadenada>														##############################
+<Referencia> ::= <Referencia> <MetodoEncadenado>													##############################
+
+<Primario> ::= this
+<Primario> ::= stringLiteral
+<Primario> ::= <AccesoVar>
+<Primario> ::= <LlamadaConstructor>
+<Primario> ::= <LlamadaMetodo>
+<Primario> ::= <LlamadaMetodoEstatico>
+<Primario> ::= <ExpresionParentizada>
+
+<AccesoVar> ::= idMetVar
+
+<LlamadaConstructor> ::= new idClase <GenericidadODiamanteOpcional> <ArgsActuales>
+
+<ExpresionParentizada> ::= ( <Expresion> )
+
+<LlamadaMetodo> ::= idMetVar <ArgsActuales>
+
+<LlamadaMetodoEstatico> ::= idClase . idMetVar <ArgsActuales>
+
+<ArgsActuales> ::= ( <ListaExpsOpcional> )
+
+<ListaExpsOpcional> ::= <ListaExps> | 
+
+<ListaExps> ::= <Expresion>
+<ListaExps> ::= <Expresion> , <ListaExps>
+
+<VarEncadenada> ::= . idMetVar
+
+<MetodoEncadenado> ::= . idMetVar <ArgsActuales>
