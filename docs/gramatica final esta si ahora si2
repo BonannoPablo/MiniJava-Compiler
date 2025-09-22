@@ -20,7 +20,7 @@
 
 <ListaMiembros> ::= <VisibilidadOpcional> <Miembro> <ListaMiembros> | 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
------------------------------LLEGUE HASTA ACÁ---------------------------------
+
 <Miembro> ::= <Atributo> | <Metodo> | <Constructor>                      ###posible ambigüedad
 <MiembroInterfaz> ::= <AtributoInicializado> | <Metodo>
 
@@ -31,11 +31,16 @@
 <Metodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> <BloqueOpcional>
 
 
+_______________________________________________________________________________________________________________________________________________________________
+<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional> | <Constructor>
+<MiembroInterfaz> ::= <Tipo> idMetVar = <Expresion> ; | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  | void idMetVar <ArgsFormalesYBloqueOpcional>
 
-<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> <Metodo> | void <Metodo> | <Constructor>
 <AtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormales> <BloqueOpcional>
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
-<Metodo> ::= idClase <ArgsFormalesYBloqueOpcional>
+_______________________________________________________________________________________________________________________________________________________________
+
+
+
 
 <Constructor> ::= public idClase <ArgsFormales> <Bloque>
 
@@ -62,10 +67,9 @@
 <ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
 
 <Sentencia> ::= ;
-<Sentencia> ::= <Asignacion> ;
-<Sentencia> ::= <Llamada> ;
-<Sentencia> ::= <VarLocal> ;
-<Sentencia> ::= <Return> ;
+<Sentencia> ::= <AsignacionOLlamada> ;
+<Sentencia> ::= <VarLocal> ;																		###VarLocal y AsignacionOLlamada tienen conflicto ya que ambos tinene idClase en
+<Sentencia> ::= <Return> ;																			###primeros, varLocal en <Tipo> y AsignacionOLlamada en expresion -> LlamadaMetodoEstatico
 <Sentencia> ::= <If>
 <Sentencia> ::= <While>
 <Sentencia> ::= <Bloque>
@@ -74,9 +78,7 @@
 <For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)
 <CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
 
-<Asignacion> ::= <Expresion>
-
-<Llamada> ::= <Expresion>
+<AsignacionOLlamada> ::= <Expresion>
 
 <VarLocal> ::= var idMetVar = <ExpresionCompuesta> ; | <Tipo> idMetVar <DeclaracionMultiple> <AsignacionOpcional> ;
 <DeclaracionMultiple> ::= , idMetVar <DeclaracionMultiple> | 
