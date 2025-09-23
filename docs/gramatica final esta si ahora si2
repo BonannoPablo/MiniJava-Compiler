@@ -155,3 +155,32 @@
 <ListaExps2> ::= , <Expresion> <ListaExps2> | 
 
 <VarMetodoEncadenado> ::= . idMetVar <ArgsActualesOpcional>
+
+
+
+
+
+
+
+
+
+
+
+________________POSIBLE SOLUCION AL TEMITA DEL CONSTRUCTOR Y LA VISIBILIDAD________________________
+
+<PrivateOpcional> ::= private | 
+
+<ListaMiembros> ::= <PrivateOpcional> <AtributoOMetodo> <ListaMiembros> | 
+<ListaMIembros> ::= public <Miembro> <ListaMiembros> 
+
+<Miembro> ::= <TipoPrimitivo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
+<Miembro> ::= void idMetVar <ArgsFormalesYBloqueOpcional> | idClase <ConstructorUOtroMiembro>
+
+<ConstructorUOtroMiembro> ::= <ArgsFormales> <Bloque> | idMetVar <CierreAtributoMetodo>
+
+<AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
+
+<Constructor> ::= idClase <ArgsFormales> <Bloque>
+
+<CierreAtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
+<ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
