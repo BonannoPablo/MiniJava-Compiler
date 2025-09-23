@@ -21,10 +21,12 @@
 <ListaMiembros> ::= <VisibilidadOpcional> <Miembro> <ListaMiembros> | 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
 
-<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional> | <Constructor>
-<MiembroInterfaz> ::= <Tipo> idMetVar = <Expresion> ; | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  | void idMetVar <ArgsFormalesYBloqueOpcional>
+<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
+<Miembro> ::= void idMetVar <ArgsFormalesYBloqueOpcional> | <Constructor>
+<MiembroInterfaz> ::= <Tipo> idMetVar = <Expresion> ; | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  
+<MiembroInterfaz> ::= void idMetVar <ArgsFormalesYBloqueOpcional>
 
-<AtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormales> <BloqueOpcional>
+<AtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
 
 <Atributo> ::= <Tipo> idMetVar <AsignacionOpcional> ;										### ahora se puede inicializar el atributo
@@ -58,16 +60,35 @@
 <ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
 
 <Sentencia> ::= ;
-<Sentencia> ::= <AsignacionOLlamada> ;
-<Sentencia> ::= <VarLocal> ;																		###VarLocal y AsignacionOLlamada tienen conflicto ya que ambos tinene idClase en
+<Sentencia> ::= <AsignacionLlamadaOVarLocal> ;																	###VarLocal y AsignacionOLlamada tienen conflicto ya que ambos tinene idClase en
 <Sentencia> ::= <Return> ;																			###primeros, varLocal en <Tipo> y AsignacionOLlamada en expresion -> LlamadaMetodoEstatico
 <Sentencia> ::= <If>
 <Sentencia> ::= <While>
 <Sentencia> ::= <Bloque>
 <Sentencia> ::= <For>
 
-<For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)						### EXPRESION Y varLocal tienen idClase en primeros
+<AsignacionLlamadaOVarLocal> ::= <VarLocalConVar>
+<AsignacionLlamadaOVarLocal> ::= <VarLocalConTipoPrimitivo> 
+<AsignacionLlamadaOVarLocal> ::= idClase <MetodoEstativoOVarLocal> 
+<AsignacionLlamadaOVarLocal> ::= <ExpresionSinLlamadaMetodoEstatico>
+
+<MetodoEstativoOVarLocal> ::=  . idMetVar <ArgsActuales> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<MetodoEstativoOVarLocal> ::= <GenericidadOpcional> idMetVar <DeclaracionMultiple> <AsignacionOpcional>
+
+<ExpresionSinLlamadaMetodoEstatico> ::= <ExpresionCompuestaSinLLamadaMetodoEstatico> <Expresion2>
+
+<ExpresionCompuestaSinLLamadaMetodoEstatico> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>   
+
+<VarLocalConVar> ::= var idMetVar = <ExpresionCompuesta> 
+<VarLocalConTipoPrimistivo> ::= <TipoPrimitivo> idMetVar <DeclaracionMultiple> <AsignacionOpcional>
+
+<For> ::= for ( <For2> <CondicionFor )	
+<For2> ::= 	<VarLocalConVar> | <TipoPrimitivo> idMetVar <DeclaracionMultiple> = <Expresion> 
+<For2> ::=  idClase <MetodoEstaticoOVarLocalInicializada> | <ExpresionSinLlamadaMetodoEstatico>
 <CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
+
+<MetodoEstaticoOVarLocalInicializada> ::= . idMetVar <ArgsActuales> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<MetodoEstaticoOVarLocalInicializada> ::= <GerenicidadOpcional> idMetVar <DeclaracionMultiple> = <Expresion>
 
 <AsignacionOLlamada> ::= <Expresion>
 
@@ -90,7 +111,8 @@
 
 <OperadorAsignacion> ::= = | += | -=
 
-<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> 
+<ExpresionCompuesta> ::= <LlamadaMetodoEstatico> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
 <ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
 
 
@@ -107,13 +129,12 @@
 <Primitivo> ::= true | false | intLiteral | charLiteral | null
 
 <Referencia> ::= <Primario> <Referencia2>
-<Referencia2> ::= <VarMetodoEncadenado> <Referencia2> | 													##############################
+<Referencia2> ::= <VarMetodoEncadenado> <Referencia2> | 													
 
 <Primario> ::= this
 <Primario> ::= stringLiteral
 <Primario> ::= <AccesoVarLlamadaMetodo>
 <Primario> ::= <LlamadaConstructor>
-<Primario> ::= <LlamadaMetodoEstatico>
 <Primario> ::= <ExpresionParentizada>
 
 <AccesoVarLlamadaMetodo> ::= idMetVar <ArgsActualesOpcional>

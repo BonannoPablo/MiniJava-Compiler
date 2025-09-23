@@ -112,6 +112,9 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
                                 currentState = States.EXCLAMATION_POINT_STATE;
                                 retrieveNextChar();
                                 break;
+                            case '?':
+                                retrieveNextChar();
+                                return new Token(IToken.TokenType.QUESTION_MARK, "?", sourceManager.getLineNumber());
                             case '=':
                                 updateLexeme();
                                 currentState = States.EQUAL_STATE;
@@ -429,8 +432,11 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
         IToken.TokenType type;
         type = switch (lexeme) {
             case "class" -> IToken.TokenType.CLASS_WORD;
+            case "interface" -> IToken.TokenType.INTERFACE_WORD;
             case "extends" -> IToken.TokenType.EXTENDS_WORD;
+            case "implements" -> IToken.TokenType.IMPLEMENTS_WORD;
             case "public" -> IToken.TokenType.PUBLIC_WORD;
+            case "private" -> IToken.TokenType.PRIVATE_WORD;
             case "static" -> IToken.TokenType.STATIC_WORD;
             case "void" -> IToken.TokenType.VOID_WORD;
             case "boolean" -> IToken.TokenType.BOOLEAN_WORD;
@@ -441,6 +447,7 @@ public class LexicalAnalyzerWithCases implements ILexicalAnalyzer {
             case "if" -> IToken.TokenType.IF_WORD;
             case "else" -> IToken.TokenType.ELSE_WORD;
             case "while" -> IToken.TokenType.WHILE_WORD;
+            case "for" -> IToken.TokenType.FOR_WORD;
             case "return" -> IToken.TokenType.RETURN_WORD;
             case "var" -> IToken.TokenType.VAR_WORD;
             case "this" -> IToken.TokenType.THIS_WORD;

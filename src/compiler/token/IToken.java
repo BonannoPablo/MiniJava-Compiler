@@ -8,8 +8,11 @@ public interface IToken {
         CHARLITERAL,
         STRINGLITERAL,
         CLASS_WORD,
+        INTERFACE_WORD,
         EXTENDS_WORD,
+        IMPLEMENTS_WORD,
         PUBLIC_WORD,
+        PRIVATE_WORD,
         STATIC_WORD,
         VOID_WORD,
         BOOLEAN_WORD,
@@ -52,7 +55,7 @@ public interface IToken {
         MINUS1,
         MULTIPLY,
         SLASH,
-        EOF,
+        EOF, FOR_WORD, QUESTION_MARK,
     }
     TokenType getTokenType();
     String getLexeme();
