@@ -6,8 +6,6 @@ import compiler.lexicalanalyzer.ILexicalAnalyzer;
 import compiler.token.IToken;
 import utils.customSet;
 
-import java.util.*;
-
 public class SyntacticAnalyzer {
     private final ILexicalAnalyzer lexicalAnalyzer;
     private IToken currentToken;
@@ -44,8 +42,8 @@ public class SyntacticAnalyzer {
         EXPRESSION_LIST,
         CONSTRUCTOR_CALL,
         ACTUAL_ARGS,
-
-
+        ATTRIBUTE_OR_METHOD,
+        FORMAL_ARGS_AND_OPTIONAL_BLOCK,
     }
 
     public SyntacticAnalyzer(ILexicalAnalyzer lexicalAnalyzer) {
@@ -129,6 +127,14 @@ public class SyntacticAnalyzer {
         }
     }
 
+    private void optionalPrivate() throws LexicalException, SyntacticException{
+        if(currentToken.getTokenType().equals(IToken.TokenType.PRIVATE_WORD)){
+            retrieveNextToken();
+        } else {
+            //Empty production
+        }
+    }
+
     private void optionalInheritance() throws LexicalException, SyntacticException {
         switch (currentToken.getTokenType()) {
             case IToken.TokenType.EXTENDS_WORD:
@@ -143,7 +149,7 @@ public class SyntacticAnalyzer {
     }
 
     private void optionalExtends() throws LexicalException, SyntacticException {
-        if (first(NonTerminal.OPTIONAL_EXTENDS).contains(currentToken.getTokenType())) {
+        if (currentToken.getTokenType().equals(IToken.TokenType.EXTENDS_WORD)) {
             retrieveNextToken();
             match(IToken.TokenType.CLASSID);
             optionalGenerics();
@@ -153,7 +159,7 @@ public class SyntacticAnalyzer {
     }
 
     private void optionalGenericsOrDiamond() throws LexicalException, SyntacticException {
-        if (first(NonTerminal.OPTIONAL_GENERICS_OR_DIAMOND).contains(currentToken.getTokenType())) {
+        if (currentToken.getTokenType().equals(IToken.TokenType.LESS_THAN)) {
             retrieveNextToken();
             optionalClassId();
             match(IToken.TokenType.GREATER_THAN);
@@ -181,8 +187,12 @@ public class SyntacticAnalyzer {
     }
 
     private void memberList() throws LexicalException, SyntacticException {
-        if (first(NonTerminal.MEMBER_LIST).contains(currentToken.getTokenType())) {
-            optionalVisibility();
+        if (first(NonTerminal.ATTRIBUTE_OR_METHOD).contains(currentToken.getTokenType()) || currentToken.getTokenType().equals(IToken.TokenType.PRIVATE_WORD)) {
+            optionalPrivate();
+            attributeOrMethod();
+            memberList();
+        } else if (currentToken.getTokenType().equals(IToken.TokenType.PUBLIC_WORD)) {
+            retrieveNextToken();
             member();
             memberList();
         } else {
@@ -201,17 +211,17 @@ public class SyntacticAnalyzer {
     }
 
     private void member() throws LexicalException, SyntacticException {
-        if (first(NonTerminal.TYPE).contains(currentToken.getTokenType())) {
-            type();
+        if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
+            primitiveType();
             match(IToken.TokenType.METVARID);
-            attributeMethod();
+            closingAttributeMethod();
         } else if (first(NonTerminal.MODIFIER).contains(currentToken.getTokenType())) {
             modifier();
             methodType();
             match(IToken.TokenType.METVARID);
             formalArgsAndOptionalBlock();
-        } else if (first(NonTerminal.CONSTRUCTOR).contains(currentToken.getTokenType())) {
-            constructor();
+        } else if (currentToken.getTokenType().equals(IToken.TokenType.CLASSID)) {
+            constructorOrMember();
         } else if (currentToken.getTokenType().equals(IToken.TokenType.VOID_WORD)) {
             retrieveNextToken();
             match(IToken.TokenType.METVARID);
@@ -241,8 +251,35 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void attributeMethod() throws LexicalException, SyntacticException {
-        if (first(NonTerminal.FORMAL_ARGS).contains(currentToken.getTokenType())) {
+    private void constructorOrMember() throws LexicalException, SyntacticException {
+        if (currentToken.getTokenType().equals(IToken.TokenType.METVARID)) {
+            retrieveNextToken();
+            closingAttributeMethod();
+        } else if(first(NonTerminal.FORMAL_ARGS).contains(currentToken.getTokenType())){
+            formalArgs();
+            block();
+        }
+    }
+
+    private void attributeOrMethod() throws LexicalException, SyntacticException {
+        if(first(NonTerminal.TYPE).contains(currentToken.getTokenType())){
+            type();
+            match(IToken.TokenType.METVARID);
+            closingAttributeMethod();
+        } else if(first(NonTerminal.MODIFIER).contains(currentToken.getTokenType())){
+            modifier();
+            methodType();
+            match(IToken.TokenType.METVARID);
+            formalArgsAndOptionalBlock();
+        } else if(currentToken.getTokenType().equals(IToken.TokenType.VOID_WORD)){
+            retrieveNextToken();
+            match(IToken.TokenType.METVARID);
+            formalArgsAndOptionalBlock();
+        }
+    }
+
+    private void closingAttributeMethod() throws LexicalException, SyntacticException {
+        if (first(NonTerminal.FORMAL_ARGS_AND_OPTIONAL_BLOCK).contains(currentToken.getTokenType())) {
             formalArgsAndOptionalBlock();
         } else {
             optionalAssignment();
@@ -280,7 +317,6 @@ public class SyntacticAnalyzer {
     }
 
     private void constructor() throws LexicalException, SyntacticException {
-        match(IToken.TokenType.PUBLIC_WORD);
         match(IToken.TokenType.CLASSID);
         formalArgs();
         block();
@@ -812,9 +848,10 @@ public class SyntacticAnalyzer {
 
     private customSet<IToken.TokenType> first(NonTerminal nonTerminal) {
         return switch (nonTerminal) {
-
         }
     }
+
+
 
    /* private Set<IToken.TokenType> first(String productionName) {
         Set<IToken.TokenType> set = null;

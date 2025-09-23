@@ -84,3 +84,10 @@ Bloque = { { }
 
 <Primario> ::= this | stringLiteral | <LlamadaConstructor> | <LlamadaMetodoEstatico> | <ExpresionParentizada> | idMetVar <AccesoVarLlamadaMetodo>
 <AccesoVarLlamadaMetodo> ::= <ArgsActuales> | 
+
+
+
+
+
+
+P(Inicial) = P(

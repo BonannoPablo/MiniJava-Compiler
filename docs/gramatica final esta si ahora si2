@@ -9,6 +9,7 @@
 <ModificadorOpcional> ::= abstract | static | final | 
 <Modificador> ::= abstract | static | final
 <VisibilidadOpcional> ::= public | private | 
+<PrivateOpcional> ::= private | 
 
 <HerenciaOpcional> ::= extends idClase <GenericidadOpcional>| implements idClase <GenericidadOpcional>| 
 <ExtendsOpcional> ::= extends idClase <GenericidadOpcional>| 
@@ -18,24 +19,26 @@
 
 <GenericidadOpcional> ::= <  idClase  > | 
 
-<ListaMiembros> ::= <VisibilidadOpcional> <Miembro> <ListaMiembros> | 
+<ListaMiembros> ::= <PrivateOpcional> <AtributoOMetodo> <ListaMiembros> | 
+<ListaMIembros> ::= public <Miembro> <ListaMiembros> 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
 
-<Miembro> ::= <Tipo> idMetVar <AtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
-<Miembro> ::= void idMetVar <ArgsFormalesYBloqueOpcional> | <Constructor>
+<Miembro> ::= <TipoPrimitivo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
+<Miembro> ::= void idMetVar <ArgsFormalesYBloqueOpcional> | idClase <ConstructorUOtroMiembro>
 <MiembroInterfaz> ::= <Tipo> idMetVar = <Expresion> ; | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  
 <MiembroInterfaz> ::= void idMetVar <ArgsFormalesYBloqueOpcional>
 
-<AtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
+<CierreAtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
 
 <Atributo> ::= <Tipo> idMetVar <AsignacionOpcional> ;										### ahora se puede inicializar el atributo
 <AsignacionOpcional> ::=   =   <Expresion> | 
 <AtributoInicializado> ::= <Tipo> idMetVar = <Expresion> ;
 
-<Metodo> ::= <ModificadorOpcional> <TipoMetodo> idMetVar <ArgsFormales> <BloqueOpcional>
+<AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> 
+<AtributoOMetodo> ::= <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
 
-<Constructor> ::= public idClase <ArgsFormales> <Bloque>
+<ConstructorUOtroMiembro> ::= <ArgsFormales> <Bloque> | idMetVar <CierreAtributoMetodo>
 
 <TipoMetodo> ::= <Tipo> | void
 
@@ -178,7 +181,8 @@ ________________POSIBLE SOLUCION AL TEMITA DEL CONSTRUCTOR Y LA VISIBILIDAD_____
 
 <ConstructorUOtroMiembro> ::= <ArgsFormales> <Bloque> | idMetVar <CierreAtributoMetodo>
 
-<AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
+<AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> 
+<AtributoOMetodo> ::= <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
 
 <Constructor> ::= idClase <ArgsFormales> <Bloque>
 

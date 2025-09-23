@@ -1,0 +1,7 @@
+F(ListaClasesEInterfaces2) = F(Clase) U F(Interfaz)
+F(Clase) = {class}
+F(Interfaz) = {interface}
+F(Modifier) = {abstract, static, final}
+F(AtributoOMetodo) = F(Tipo) U F(Modifier) U {void}
+F(MiembroInterfaz) = F(Tipo) U F(Modifier) U {void}
+F(TipoPrimitivo) = {boolean, char, int}
