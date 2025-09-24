@@ -10,6 +10,7 @@ import sourcemanager.SourceManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Queue;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,10 +27,14 @@ public class Main {
             syntacticAnalyzer.start();
         } catch(LexicalException e){
             printLexicalException(e);
-        } catch(SyntacticException e){
+        } catch(SyntacticExceptions e){
             exceptionFlag = true;
-            System.out.println(e.getMessage());
-            System.out.println("[Error:" + e.getLexeme() + "|" + e.getLineNumber() + "]");
+            Queue<SyntacticException> exceptionQueue = e.getExceptionsQueue();
+            while(!exceptionQueue.isEmpty()) {
+                SyntacticException ex = exceptionQueue.poll();
+                System.out.println(ex.getMessage());
+                System.out.println("[Error:" + ex.getLexeme() + "|" + ex.getLineNumber() + "]");
+            }
         }
         if(!exceptionFlag) System.out.println("[SinErrores]");
         try {
@@ -81,5 +86,8 @@ public class Main {
             System.out.println("File " + filePath + " not found");
             System.exit(1);
         }
+        int x,y;
+        int z = 1;
+        
     }
 }
