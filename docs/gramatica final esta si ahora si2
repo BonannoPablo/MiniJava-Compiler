@@ -75,27 +75,27 @@
 <AsignacionLlamadaOVarLocal> ::= idClase <MetodoEstativoOVarLocal> 
 <AsignacionLlamadaOVarLocal> ::= <ExpresionSinLlamadaMetodoEstatico>
 
-<MetodoEstativoOVarLocal> ::=  . idMetVar <ArgsActuales> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<MetodoEstativoOVarLocal> ::=  . idMetVar <ArgsActuales> <Referencia2> <ExpresionCompuesta2> <Expresion2>
 <MetodoEstativoOVarLocal> ::= <GenericidadOpcional> idMetVar <DeclaracionMultiple> <AsignacionOpcional>
 
 <ExpresionSinLlamadaMetodoEstatico> ::= <ExpresionCompuestaSinLLamadaMetodoEstatico> <Expresion2>
 
-<ExpresionCompuestaSinLLamadaMetodoEstatico> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>   
+<ExpresionCompuestaSinLLamadaMetodoEstatico> ::= <ExpresionBasica> <ExpresionCompuesta2>   
 
-<VarLocalConVar> ::= var idMetVar = <ExpresionCompuesta> 
+<VarLocalConVar> ::= var idMetVar = <Expresion> 
 <VarLocalConTipoPrimistivo> ::= <TipoPrimitivo> idMetVar <DeclaracionMultiple> <AsignacionOpcional>
 
-<For> ::= for ( <For2> <CondicionFor )	
+<For> ::= for ( <For2> <CondicionFor ) <Sentencia>	
 <For2> ::= 	<VarLocalConVar> | <TipoPrimitivo> idMetVar <DeclaracionMultiple> = <Expresion> 
-<For2> ::=  idClase <MetodoEstaticoOVarLocalInicializada> | <ExpresionSinLlamadaMetodoEstatico>
-<CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
+<For2> ::=  idClase <MetodoEstaticoOVarLocalInicializada> | <ExpresionSinLlamadaMetodoEstatico> | 
+<CondicionFor> ::= ; <ExpresionCompuestaOpcional> ; <ExpresionOpcional> | : <Expresion>
 
-<MetodoEstaticoOVarLocalInicializada> ::= . idMetVar <ArgsActuales> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
+<MetodoEstaticoOVarLocalInicializada> ::= . idMetVar <ArgsActuales> <Referencia2> <ExpresionCompuesta2>  <Expresion2>
 <MetodoEstaticoOVarLocalInicializada> ::= <GerenicidadOpcional> idMetVar <DeclaracionMultiple> = <Expresion>
 
 <AsignacionOLlamada> ::= <Expresion>
 
-<VarLocal> ::= var idMetVar = <ExpresionCompuesta>  | <Tipo> idMetVar <DeclaracionMultiple> <AsignacionOpcional> 
+<VarLocal> ::= var idMetVar = <Expression>  | <Tipo> idMetVar <DeclaracionMultiple> <AsignacionOpcional> 
 <DeclaracionMultiple> ::= , idMetVar <DeclaracionMultiple> | 
 
 <Return> ::= return <ExpresionOpcional>
@@ -114,9 +114,9 @@
 
 <OperadorAsignacion> ::= = | += | -=
 
-<ExpresionCompuesta> ::= <ExpresionBasica> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> 
-<ExpresionCompuesta> ::= <LlamadaMetodoEstatico> <Referencia2> <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2>
-<ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta2> | 
+<ExpresionCompuesta> ::= <ExpresionBasica> <ExpresionCompuesta2> 
+<ExpresionCompuesta> ::= <LlamadaMetodoEstatico> <Referencia2> <ExpresionCompuesta2>
+<ExpresionCompuesta2> ::= <OperadorBinario> <ExpresionBasica> <ExpresionCompuesta> | 
 
 
 <OperadorBinario> ::= || | && | == | != | < | > | <= | >= | + | - | * | / | %

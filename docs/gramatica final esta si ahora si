@@ -59,7 +59,7 @@
 <Sentencia> ::= <Bloque>
 <Sentencia> ::= <For>
 
-<For> ::= for ( <Expresion> <CondicionFor> ) | for( <VarLocal> <CondicionFor>)
+<For> ::= for ( <Expresion> <CondicionFor> ) <Sentencia> | for( <VarLocal> <CondicionFor>) <Sentencia>
 <CondicionFor> ::= ; <ExpresionCompuesta> ; <Expresion> | : <Expresion>
 
 <Asignacion> ::= <Expresion>

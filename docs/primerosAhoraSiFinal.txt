@@ -5,3 +5,31 @@ F(Modifier) = {abstract, static, final}
 F(AtributoOMetodo) = F(Tipo) U F(Modifier) U {void}
 F(MiembroInterfaz) = F(Tipo) U F(Modifier) U {void}
 F(TipoPrimitivo) = {boolean, char, int}
+F(Tipo) = F(TipoPrimitivo) U {idClase}
+F(FormalArgs) = { ( }
+F(FormalArgsAndOptionalBLock) = F(FormalArgs)
+F(FormalArgsList) = F(ArgFormal)
+F(ArgFormal) = F(Tipo)
+F(Block) = { { }
+F(Sentence) = F(AsignacionLlamadaOVarLocal} U F(Block) U {return, if, while, for, ;}
+F(AsignacionLlamadaOVarLocal) = {var, idClase} U F(TipoPrimitivo) U F(ExpresionSinLlamadaMetodoEstatico)
+F(ExpresionSinLlamadaMetodoEstatico) = F(OperadorUnario) U F(Operando)
+F(OperadorUnario) = {+, ++, -, --, !}
+F(Operando) = F(Primitivo) U F(Referencia)
+F(Primitivo) = {true, false, intLiteral, charLiteral, null}
+F(Referencia) = {this, stringLiteral, idMetVar, new, ( }
+F(LocalVarWVar) = {var}
+F(LocalVarWPrimitiveType) = F(TipoPrimitivo)
+F(Expresion) = F(ExpresionBasica) U F(LlamadaMetodoEstatico)
+F(ExpresionBasica) = F(OperadorUnario) U F(Operando)
+F(LlamadaMetodoEstatico) = {idClase}
+F(AssignmentOperator) = { = }
+F(OperadorBinario) = {||, &&, ==, !=, <, >, <=, >=, +, -, *, /, %}
+F(VarMetodoEncadenado) = { . }
+F(ConstructorCall) = {new}
+F(ExpressionList) = F(Expresion)
+F(ArgsActuales) = { ( }
+
+F(For) = {for}
+F(If) = {if}
+F(Return) = {return

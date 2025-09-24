@@ -1,5 +1,0 @@
-///[SinErrores]
-
-"hello"
-
-"hello\" \\ \n"
