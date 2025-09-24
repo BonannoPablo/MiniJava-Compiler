@@ -1,3 +1,5 @@
+Obs. el carácter  es la cadena vacía
+
 <Inicial> ::= <ListaClasesEInterfaces> eof
 
 <ListaClasesEInterfaces> ::= <Clase> <ListaClasesEInterfaces> | <Interfaz> <ListaClasesEInterfaces> | 

@@ -36,7 +36,10 @@ public class Main {
                 System.out.println("[Error:" + ex.getLexeme() + "|" + ex.getLineNumber() + "]");
             }
         }
-        if(!exceptionFlag) System.out.println("[SinErrores]");
+        if(!exceptionFlag) {
+            System.out.println("Compilation successful");
+            System.out.println("[SinErrores]");
+        }
         try {
             sourceManager.close();
         } catch (IOException e) {

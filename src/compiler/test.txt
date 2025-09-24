@@ -1,4 +1,22 @@
-///[Error:}|4]
-class A {
-    int x
+class TestErrors {
+    public static void main(String args) {
+        int a = 5
+        int b = 10;
+        
+        if a > b {                                          //falta parentesis
+            System.out.println("A is greater than B");      //.out
+        }
+
+        for (int i = 0 i < 5; i++) {                        //i++
+            System.out.println("Iteration: " + i);             //.out
+        }
+        System.out.println("Result " result);               //result
+    }
 }
+
+// Errores esperados
+//Lexico []
+//[int|3]
+//[a|6]
+//[.|7]
+//
