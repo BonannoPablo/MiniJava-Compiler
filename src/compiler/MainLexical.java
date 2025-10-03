@@ -1,9 +1,9 @@
 package compiler;
 
 import compiler.exceptions.*;
-import compiler.lexicalanalyzer.ILexicalAnalyzer;
-import compiler.lexicalanalyzer.LexicalAnalyzerWithCases;
-import compiler.token.IToken;
+import compiler.lexicalanalyzer.LexicalAnalyzer;
+import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
+import compiler.token.Token;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
 
@@ -28,8 +28,8 @@ public class MainLexical {
     }
 
     private static void runLexicalAnalyzer(SourceManager sourceManager) {
-        ILexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzerWithCases(sourceManager);
-        IToken token = null;
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzerImpl(sourceManager);
+        Token token = null;
         boolean exceptionFLag = false;
         do {
             try {
@@ -39,13 +39,13 @@ public class MainLexical {
                 exceptionFLag = true;
                 printLexicalException(e);
             }
-        } while (token == null || token.getTokenType() != IToken.TokenType.EOF);
+        } while (token == null || token.getTokenType() != Token.TokenType.EOF);
         if (!exceptionFLag) {
             System.out.println("[SinErrores]");
         }
     }
 
-    private static void printToken(IToken token) {
+    private static void printToken(Token token) {
         System.out.println("(" + token.getTokenType() + ", " + token.getLexeme() + ", " + token.getLineNumber() + ")");
     }
 

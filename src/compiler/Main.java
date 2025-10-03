@@ -1,10 +1,11 @@
 package compiler;
 
 import compiler.exceptions.*;
-import compiler.lexicalanalyzer.ILexicalAnalyzer;
-import compiler.lexicalanalyzer.LexicalAnalyzerWithCases;
+import compiler.lexicalanalyzer.LexicalAnalyzer;
+import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
-import compiler.token.IToken;
+import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
+import compiler.token.Token;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
 
@@ -20,7 +21,7 @@ public class Main {
         String filePath = args[0];
         SourceManager sourceManager = new EfficientSourceManager();
         openFile(sourceManager, filePath);
-        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(new LexicalAnalyzerWithCases(sourceManager));
+        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzerImpl(new LexicalAnalyzerImpl(sourceManager));
 
         boolean exceptionFlag = false;
         try{
@@ -49,8 +50,8 @@ public class Main {
     }
 
     private static void runLexicalAnalyzer(SourceManager sourceManager) {
-        ILexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzerWithCases(sourceManager);
-        IToken token = null;
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzerImpl(sourceManager);
+        Token token = null;
         boolean exceptionFLag = false;
         do {
             try {
@@ -60,7 +61,7 @@ public class Main {
                 exceptionFLag = true;
                 printLexicalException(e);
             }
-        } while (token == null || token.getTokenType() != IToken.TokenType.EOF);
+        } while (token == null || token.getTokenType() != Token.TokenType.EOF);
         if (!exceptionFLag) {
             System.out.println("[SinErrores]");
         }
@@ -68,7 +69,7 @@ public class Main {
 
     }
 
-    private static void printToken(IToken token) {
+    private static void printToken(Token token) {
         System.out.println("(" + token.getTokenType() + ", " + token.getLexeme() + ", " + token.getLineNumber() + ")");
     }
 

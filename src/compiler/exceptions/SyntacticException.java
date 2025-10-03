@@ -1,11 +1,11 @@
 package compiler.exceptions;
 
-import compiler.token.IToken;
+import compiler.token.Token;
 
 public class SyntacticException extends Exception {
-    private IToken tokenFound;
+    private Token tokenFound;
     //private final IToken.TokenType TokenExpected;
-    public SyntacticException(IToken tokenFound, String tokenTypeExpected) {
+    public SyntacticException(Token tokenFound, String tokenTypeExpected) {
         super("Syntax error in line: " + tokenFound.getLineNumber() + ". Expected: " + tokenTypeExpected + " but found: " + tokenFound.getLexeme());
         this.tokenFound = tokenFound;
     }
