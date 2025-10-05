@@ -3,7 +3,6 @@ package compiler;
 import compiler.exceptions.*;
 import compiler.lexicalanalyzer.LexicalAnalyzer;
 import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
-import compiler.symboltable.SymbolTable;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
 import compiler.token.Token;
@@ -14,10 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Queue;
 
-import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
-
-public class Main {
-    public static void main(String[] args) {
+public class MainSyntactic {
+    public static void main2(String[] args) {
         if (args.length != 1)
             throw new RuntimeException("Invalid number of arguments. Must specify the source code file path to compile.");
 
@@ -95,6 +92,6 @@ public class Main {
         }
         int x,y;
         int z = 1;
-        
+
     }
 }

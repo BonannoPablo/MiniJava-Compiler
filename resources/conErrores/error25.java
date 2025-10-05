@@ -1,4 +1,4 @@
-///[Error:=|5]
+///[Error:=|4]
 class A {
     int x = x.a ?
             y = 2 :

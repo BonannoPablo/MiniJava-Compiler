@@ -1,6 +1,6 @@
 ///[Error:)|4]
 class A {
     void m(){
-        for();
+        )El for ha muerto, y lo hemos matado
     }
 }

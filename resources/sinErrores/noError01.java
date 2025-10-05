@@ -22,17 +22,12 @@ class JavaSyntaxDemo {
 
     // Method to demonstrate a simple loop (for loop)
     public void countDown() {
-        for (int i = count; i >= 0; --i) {
-            System.println("Counting down: " + i);
-        }
     }
 
     // Method to demonstrate array usage
     public void printArray() {
         String fruits = "Apple";
-        for (String fruit : fruits) {
-            System.println(fruit);
-        }
+
     }
 
     // Method with a return type (demonstrating a simple mathematical operation)
@@ -56,4 +51,20 @@ class JavaSyntaxDemo {
         // Call method to double the count and print it
         System.println("Doubled count: " + demo.doubleCount());
     }
+}
+
+interface A{
+
+}
+abstract class B{
+
+}
+static interface C<A>{
+
+}
+final interface D extends A{
+
+}
+class E implements D{
+
 }
