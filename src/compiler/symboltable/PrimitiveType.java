@@ -1,7 +1,9 @@
 package compiler.symboltable;
 
+import compiler.token.Token;
+
 public class PrimitiveType extends Type{
-    public PrimitiveType(String name) {
-        this.name = name;
+    public PrimitiveType(Token token) {
+        super(token);
     }
 }

@@ -34,3 +34,9 @@ bin/
 Etapa */
 Etapa *.*
 docs/~*
+
+*.zip
+*.txt
+docs/Informe*
+docs/*.docx
+docs/.txt

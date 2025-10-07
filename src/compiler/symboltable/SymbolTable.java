@@ -1,5 +1,9 @@
 package compiler.symboltable;
 
+import compiler.exceptions.SemanticException;
+import compiler.token.Token;
+import compiler.token.TokenImpl;
+
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -12,6 +16,17 @@ public class SymbolTable {
     public SymbolTable() {
         classTable = new Hashtable<>();
         interfaceTable = new Hashtable<>();
+        generateDefaultClasses();
+    }
+
+    private void generateDefaultClasses() {
+        try {
+            putClass(new ObjectEntry());
+            putClass(new StringEntry());
+            putClass(new SystemEntry());
+        } catch(SemanticException e){
+            //
+        }
     }
 
     public ClassOrInterfaceEntry getCurrentClassOrInterface() {
@@ -25,8 +40,10 @@ public class SymbolTable {
         return currentClass;
     }
 
-    public void putClass(ClassEntry classItem){
-        classTable.put(classItem.getName(), classItem);
+    public void putClass(ClassEntry classItem) throws SemanticException {
+        if(classTable.put(classItem.getName(), classItem) == null){
+            throw new SemanticException("Duplicate class");
+        }
         currentClass = classItem;
         currentInterface = null;
     }

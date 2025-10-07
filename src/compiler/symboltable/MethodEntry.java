@@ -7,7 +7,7 @@ import java.util.List;
 public class MethodEntry extends MethodOrConstructor{
     String name;
     Token token;
-    String returnType;
+    Type returnType;
     Token modifier;
     Token visibility;
 
@@ -16,7 +16,7 @@ public class MethodEntry extends MethodOrConstructor{
         name = token.getLexeme();
     }
 
-    public void setReturnType(String type) {
+    public void setReturnType(Type type) {
         returnType = type;
     }
 

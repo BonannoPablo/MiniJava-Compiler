@@ -1,6 +1,7 @@
 package compiler.syntacticanalyzer;
 
 import compiler.exceptions.LexicalException;
+import compiler.exceptions.SemanticException;
 import compiler.exceptions.SyntacticException;
 import compiler.exceptions.SyntacticExceptions;
 import compiler.lexicalanalyzer.LexicalAnalyzer;
@@ -10,8 +11,6 @@ import utils.CustomHashSet;
 import utils.CustomSet;
 
 import java.util.*;
-
-//TODO include the use of Type classes to represent typres in the symbolTable
 
 public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     public static SymbolTable symbolTable;
@@ -46,7 +45,11 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         CONSTRUCTOR_CALL,
         ACTUAL_ARGS,
         ATTRIBUTE_OR_METHOD,
-        FORMAL_ARGS_AND_OPTIONAL_BLOCK, FORMAL_ARG, OPERAND, REFERENCE, COMPOUND_EXPRESSION,
+        FORMAL_ARGS_AND_OPTIONAL_BLOCK,
+        FORMAL_ARG,
+        OPERAND,
+        REFERENCE,
+        COMPOUND_EXPRESSION,
     }
 
     public SyntacticAnalyzerImpl(LexicalAnalyzer lexicalAnalyzer) {
@@ -54,7 +57,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         exceptions = new LinkedList<>();
     }
 
-    public void start() throws LexicalException, SyntacticExceptions {
+    public void start() throws LexicalException, SyntacticExceptions, SemanticException {
         symbolTable = new SymbolTable();
 
         retrieveNextToken();
@@ -65,7 +68,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void classAndInterfaceList() throws LexicalException {
+    private void classAndInterfaceList() throws LexicalException, SemanticException {
         Token modifier = optionalModifier();
         if (first(NonTerminal.CLASS_AND_INTERFACE_LIST2).contains(currentToken.getTokenType())) {
             classAndInterfaceList2(modifier);
@@ -74,7 +77,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void classAndInterfaceList2(Token modifier) throws LexicalException {
+    private void classAndInterfaceList2(Token modifier) throws LexicalException, SemanticException {
         if (first(NonTerminal.CLASS_STATEMENT).contains(currentToken.getTokenType())) {
             classStatement(modifier);
             classAndInterfaceList();
@@ -89,7 +92,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void classStatement(Token modifier) throws LexicalException {
+    private void classStatement(Token modifier) throws LexicalException, SemanticException {
         match(Token.TokenType.CLASS_WORD);
         Token classId = currentToken;
         match(Token.TokenType.CLASSID);
@@ -267,13 +270,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private void member(Token visibility) throws LexicalException {
         if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
-            String type = primitiveType();
+            Type type = primitiveType();
             Token metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
             closingAttributeMethod(type, metVarIdToken, visibility);
         } else if (first(NonTerminal.MODIFIER).contains(currentToken.getTokenType())) {
             Token modifier = modifier();
-            String type = methodType();
+            Type type = methodType();
             Token metVarId = currentToken;
             match(Token.TokenType.METVARID);
 
@@ -292,7 +295,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             Token metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
-            methodEntry.setReturnType("void");
+            methodEntry.setReturnType(null);
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentClass().addMethod(methodEntry);
             formalArgsAndOptionalBlock();
@@ -306,14 +309,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private void interfaceMember(Token visibility) throws LexicalException {
         if (first(NonTerminal.TYPE).contains(currentToken.getTokenType())) {
-            String type = type();
+            Type type = type();
             Token metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
 
             closingAttributeMethodInterface(metVarIdToken, type, visibility);
         } else if (first(NonTerminal.MODIFIER).contains(currentToken.getTokenType())) {
             Token modifier = modifier();
-            String type = methodType();
+            Type type = methodType();
             Token metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
@@ -328,7 +331,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             match(Token.TokenType.METVARID);
 
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
-            methodEntry.setReturnType("void");
+            methodEntry.setReturnType(null);
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
 
@@ -343,10 +346,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private void constructorOrMember(Token classIdToken, Token visibility) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.METVARID) || currentToken.getTokenType().equals(Token.TokenType.LESS_THAN)) {
-            optionalGenerics(); //TODO handle generics
+            Type type = new ClassType(classIdToken, optionalGenerics());
             var metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
-            closingAttributeMethod(classIdToken.getLexeme(), metVarIdToken, visibility);
+            closingAttributeMethod(type, metVarIdToken, visibility);
         } else if (first(NonTerminal.FORMAL_ARGS).contains(currentToken.getTokenType())) {
             ConstructorEntry constructor = new ConstructorEntry(classIdToken);
             symbolTable.getCurrentClass().addConstructor(constructor);
@@ -377,7 +380,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }*/
 
-    private void closingAttributeMethod(String classId, Token metVarIdToken, Token visibility) throws LexicalException {
+    private void closingAttributeMethod(Type classId, Token metVarIdToken, Token visibility) throws LexicalException {
         if (first(NonTerminal.FORMAL_ARGS_AND_OPTIONAL_BLOCK).contains(currentToken.getTokenType())) {
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
             methodEntry.setReturnType(classId);
@@ -393,7 +396,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void closingAttributeMethodInterface(Token metVarIdToken, String type, Token visibility) throws LexicalException {
+    private void closingAttributeMethodInterface(Token metVarIdToken, Type type, Token visibility) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.EQUAL)) {
             match(Token.TokenType.EQUAL);
             compoundExpression();
@@ -432,10 +435,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private String methodType() throws LexicalException {
+    private Type methodType() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.VOID_WORD)) {
-            retrieveNextToken();
-            return "void";
+            match(Token.TokenType.VOID_WORD);
+            return null;
         } else if (first(NonTerminal.TYPE).contains(currentToken.getTokenType())) {
             return type();
         } else {
@@ -447,12 +450,11 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private String type() throws LexicalException {
+    private Type type() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
-            String type = currentToken.getLexeme();
-            retrieveNextToken();
-            optionalGenerics(); //TODO add generics to types
-            return type;
+            Token classIdToken = currentToken;
+            match(Token.TokenType.CLASSID);
+            return new ClassType(classIdToken, optionalGenerics());
         } else if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
             return primitiveType();
         } else {
@@ -464,17 +466,18 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private String primitiveType() throws LexicalException {
+    private Type primitiveType() throws LexicalException {
+        Token token = currentToken;
         switch (currentToken.getTokenType()) {
             case Token.TokenType.INT_WORD:
-                retrieveNextToken();
-                return "int";
+                match(Token.TokenType.INT_WORD);
+                return new PrimitiveType(token);
             case Token.TokenType.BOOLEAN_WORD:
-                retrieveNextToken();
-                return "boolean";
+                match(Token.TokenType.BOOLEAN_WORD);
+                return new PrimitiveType(token);
             case Token.TokenType.CHAR_WORD:
-                retrieveNextToken();
-                return "char";
+                match(Token.TokenType.CHAR_WORD);
+                return new PrimitiveType(token);
             default:
                 if (!panicMode) {
                     exceptions.add(new SyntacticException(currentToken, "a primitive type"));

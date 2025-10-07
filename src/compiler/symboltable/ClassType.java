@@ -1,14 +1,16 @@
 package compiler.symboltable;
 
-public class ClassType extends Type{
-    String genericType;
+import compiler.token.Token;
 
-    public ClassType(String name, String genericType) {
-        super.name = name;
+public class ClassType extends Type{
+    Token genericType;
+
+    public ClassType(Token token, Token genericType) {
+        super(token);
         this.genericType = genericType;
     }
 
     public String getGenericType() {
-        return genericType;
+        return genericType.getLexeme();
     }
 }

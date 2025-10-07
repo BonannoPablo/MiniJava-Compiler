@@ -20,19 +20,20 @@ Obs. el carácter  es la cadena vacía
 
 <GenericidadOpcional> ::= <  idClase  > | 
 
-<ListaMiembros> ::= <PrivateOpcional> <AtributoOMetodo> <ListaMiembros> | 
-<ListaMIembros> ::= public <Miembro> <ListaMiembros> 
+<ListaMiembros> ::= <VisibilidadOpcional> <AtributoOMetodo> <ListaMiembros> | 
+####<ListaMIembros> ::= public <Miembro> <ListaMiembros> 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
 
 <Miembro> ::= <TipoPrimitivo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
 <Miembro> ::= void idMetVar <ArgsFormalesYBloqueOpcional> | idClase <ConstructorUOtroMiembro>
-<MiembroInterfaz> ::= <Tipo> idMetVar = <Expresion> ; | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  
+<MiembroInterfaz> ::= <Tipo>  idMetVar <AtributoInicializadoOMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  
 <MiembroInterfaz> ::= void idMetVar <ArgsFormalesYBloqueOpcional>
 
 <CierreAtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
+<CierreAtributoMetodoInterfaz> ::=   = <ExpresionCompuesta> ; | <ArgsFormalesYBloqueOpcional>
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
 									
-<AsignacionOpcional> ::=   =   <Expresion> | 
+<AsignacionOpcional> ::=   =   <ExpresionCompuesta> | 
 
 <AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> 
 <AtributoOMetodo> ::= <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
@@ -62,8 +63,8 @@ Obs. el carácter  es la cadena vacía
 <ListaSentencias> ::= <Sentencia> <ListaSentencias> | 
 
 <Sentencia> ::= ;
-<Sentencia> ::= <AsignacionLlamadaOVarLocal> ;														
-<Sentencia> ::= <Return> ;															
+<Sentencia> ::= <AsignacionLlamadaOVarLocal> ;											
+<Sentencia> ::= <Return> ;											
 <Sentencia> ::= <If>
 <Sentencia> ::= <While>
 <Sentencia> ::= <Bloque>
@@ -81,7 +82,7 @@ Obs. el carácter  es la cadena vacía
 
 <ExpresionCompuestaSinLLamadaMetodoEstatico> ::= <ExpresionBasica> <ExpresionCompuesta2>   
 
-<VarLocalConVar> ::= var idMetVar = <Expresion> 
+<VarLocalConVar> ::= var idMetVar = <ExpresionCompuesta> 
 <VarLocalConTipoPrimitivo> ::= <TipoPrimitivo> idMetVar <DeclaracionMultiple> <AsignacionOpcional>
 
 <For> ::= for ( <For2> <CondicionFor ) <Sentencia>	

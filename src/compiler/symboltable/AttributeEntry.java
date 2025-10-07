@@ -5,10 +5,10 @@ import compiler.token.Token;
 public class AttributeEntry {
     private final Token token;
     String name;
-    String type;
+    Type type;
     Token visibility;
 
-    public AttributeEntry(Token token, String type) {
+    public AttributeEntry(Token token, Type type) {
         this.token = token;
         this.name = token.getLexeme();
         this.type = type;
