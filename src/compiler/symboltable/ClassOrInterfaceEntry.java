@@ -25,10 +25,13 @@ public abstract class ClassOrInterfaceEntry {
         AttributeEntry attributeEntry = attributes.put(attribute.getName(), attribute);
         if(attributeEntry != null)
             throw new SemanticException("Duplicate attribute name");
-
     }
 
     protected Token.TokenType getModifier() {
         return modifier;
+    }
+
+    protected boolean hasAttribute(AttributeEntry attribute) {
+        return attributes.containsKey(attribute.getName());
     }
 }

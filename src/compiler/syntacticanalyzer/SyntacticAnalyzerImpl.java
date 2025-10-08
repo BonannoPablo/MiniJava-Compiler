@@ -169,7 +169,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void optionalInheritance() throws LexicalException {
+    private void optionalInheritance() throws LexicalException, SemanticException {
         switch (currentToken.getTokenType()) {
             case Token.TokenType.EXTENDS_WORD:
                 retrieveNextToken();

@@ -81,11 +81,15 @@ public class SymbolTable {
         }
     }
 
-    public ClassEntry existsClass(Token parent) {
+    public ClassEntry getClassEntry(Token parent) {
         return classTable.get(parent.getLexeme());
     }
 
     public InterfaceEntry existsInterface(Token parent) {
         return interfaceTable.get(parent.getLexeme());
+    }
+
+    public boolean existsClass(String name) {
+        return classTable.containsKey(name);
     }
 }

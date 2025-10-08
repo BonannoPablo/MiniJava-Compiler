@@ -51,7 +51,9 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         currentMethod = constructor;
     }
 
-    public void setParent(Token parent){
+    public void setParent(Token parent) throws SemanticException {
+        if(parent.getLexeme().equals(token.getLexeme()))
+            throw new SemanticException("Cannot inherit from itself");
         this.parent = parent;
     }
 
@@ -63,7 +65,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
     public void checkDeclaration() throws SemanticException {
         if(parent != null) {
-            ClassEntry parentClass = symbolTable.existsClass(parent);
+            ClassEntry parentClass = symbolTable.getClassEntry(parent);
             if(parentClass != null) {
                 parentClass.checkCircularInheritance(this);
                 Token.TokenType parentModifier = parentClass.getModifier();
@@ -112,7 +114,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
             return;
         if(name.equals(classEntry.name))
             throw new SemanticException("Illegal cyclic inheritance");
-        ClassEntry parentClass = symbolTable.existsClass(parent);
+        ClassEntry parentClass = symbolTable.getClassEntry(parent);
         parentClass.checkCircularInheritance(classEntry);
     }
 }

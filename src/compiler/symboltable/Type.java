@@ -14,4 +14,8 @@ public abstract class Type {
     public String getName() {
         return name;
     }
+
+    public Token getToken() {
+        return token;
+    }
 }

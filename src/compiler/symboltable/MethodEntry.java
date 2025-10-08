@@ -1,8 +1,11 @@
 package compiler.symboltable;
 
+import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
 import java.util.List;
+
+import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 
 public class MethodEntry{
     String name;
@@ -39,6 +42,9 @@ public class MethodEntry{
     }
 
     public void checkDeclaration() {
-
+    }
+    public void checkConstructionDeclaration() throws SemanticException {
+        if(!name.equals(symbolTable.getCurrentClass().getName()))
+            throw new SemanticException("Constructor should be named after class name");
     }
 }

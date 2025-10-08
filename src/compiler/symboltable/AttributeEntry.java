@@ -1,6 +1,8 @@
 package compiler.symboltable;
 
+import compiler.exceptions.SemanticException;
 import compiler.token.Token;
+import compiler.token.TokenImpl;
 
 import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 
@@ -14,6 +16,7 @@ public class AttributeEntry {
         this.token = token;
         this.name = token.getLexeme();
         this.type = type;
+        this.visibility = new TokenImpl(Token.TokenType.PUBLIC_WORD, "public", -1);
     }
 
     public void setVisibility(Token visibility) {
@@ -24,7 +27,9 @@ public class AttributeEntry {
         return name;
     }
 
-    public void checkDeclaration() {
-        //TODO
+    public void checkDeclaration() throws SemanticException {
+        if(type.getToken().getTokenType() == Token.TokenType.CLASSID
+         && ! symbolTable.existsClass(type.getName()))
+            throw new SemanticException("Class not found");
     }
 }
