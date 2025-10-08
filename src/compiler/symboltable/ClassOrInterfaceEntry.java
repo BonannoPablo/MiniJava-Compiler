@@ -22,8 +22,10 @@ public abstract class ClassOrInterfaceEntry {
     public abstract MethodEntry getCurrentMethod();
 
     public void addAttribute(AttributeEntry attribute) throws SemanticException {
-        if(attributes.put(attribute.getName(), attribute) != null)
+        AttributeEntry attributeEntry = attributes.put(attribute.getName(), attribute);
+        if(attributeEntry != null)
             throw new SemanticException("Duplicate attribute name");
+
     }
 
     protected Token.TokenType getModifier() {

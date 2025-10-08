@@ -2,6 +2,8 @@ package compiler.symboltable;
 
 import compiler.token.Token;
 
+import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
+
 public class AttributeEntry {
     private final Token token;
     String name;
@@ -23,6 +25,6 @@ public class AttributeEntry {
     }
 
     public void checkDeclaration() {
-
+        //TODO
     }
 }

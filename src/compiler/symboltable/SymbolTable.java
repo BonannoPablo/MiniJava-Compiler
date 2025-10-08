@@ -76,8 +76,8 @@ public class SymbolTable {
 
     public void checkDeclarations() throws SemanticException {
         for(ClassEntry c: classTable.values()){
+            currentClass = c;
             c.checkDeclaration();
-
         }
     }
 

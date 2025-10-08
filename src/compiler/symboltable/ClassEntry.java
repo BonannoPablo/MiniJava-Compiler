@@ -107,7 +107,12 @@ public class ClassEntry extends ClassOrInterfaceEntry{
             throw new SemanticException("Abstract class cannot inherit from concrete class");
     }
 
-    private void checkCircularInheritance(ClassEntry classEntry) {
-        //TODO
+    private void checkCircularInheritance(ClassEntry classEntry) throws SemanticException {
+        if(name.equals("Object"))
+            return;
+        if(name.equals(classEntry.name))
+            throw new SemanticException("Illegal cyclic inheritance");
+        ClassEntry parentClass = symbolTable.existsClass(parent);
+        parentClass.checkCircularInheritance(classEntry);
     }
 }
