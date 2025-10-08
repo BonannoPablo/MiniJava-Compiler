@@ -21,4 +21,8 @@ public class AttributeEntry {
     public String getName() {
         return name;
     }
+
+    public void checkDeclaration() {
+
+    }
 }

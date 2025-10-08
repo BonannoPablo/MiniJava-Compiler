@@ -186,7 +186,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 optionalGenerics();
                 break;
             default:
-                symbolTable.getCurrentClass().setParent(null);
                 symbolTable.getCurrentClass().setImplementedInterface(null);
                 //Empty production
         }

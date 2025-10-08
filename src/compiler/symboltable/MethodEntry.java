@@ -37,4 +37,8 @@ public class MethodEntry{
     public void setParameters(List<ParameterEntry> parameterEntries) {
         parameters = parameterEntries;
     }
+
+    public void checkDeclaration() {
+
+    }
 }

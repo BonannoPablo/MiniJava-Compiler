@@ -2,10 +2,10 @@ package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
 import compiler.token.Token;
-import compiler.token.TokenImpl;
+
 
 import java.util.Hashtable;
-import java.util.Iterator;
+
 import java.util.Map;
 
 public class SymbolTable {
@@ -72,5 +72,20 @@ public class SymbolTable {
         for(InterfaceEntry i: interfaceTable.values()){
             System.out.println(i.toString());
         }
+    }
+
+    public void checkDeclarations() throws SemanticException {
+        for(ClassEntry c: classTable.values()){
+            c.checkDeclaration();
+
+        }
+    }
+
+    public ClassEntry existsClass(Token parent) {
+        return classTable.get(parent.getLexeme());
+    }
+
+    public InterfaceEntry existsInterface(Token parent) {
+        return interfaceTable.get(parent.getLexeme());
     }
 }

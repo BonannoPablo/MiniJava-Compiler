@@ -41,4 +41,8 @@ public class InterfaceEntry extends ClassOrInterfaceEntry{
         methods.add(method);
         currentMethod = method;
     }
+
+    public void checkCircularInheritance(ClassEntry classEntry) {
+        //TODO
+    }
 }

@@ -7,11 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ClassOrInterfaceEntry {
-    protected Token modifier;
+    protected Token modifierToken;
+    protected Token.TokenType modifier;
     Map<String, AttributeEntry> attributes;
 
-    public void setModifier(Token modifier) {
-        this.modifier = modifier;
+    public void setModifier(Token modifierToken) {
+        this.modifierToken = modifierToken;
+        if(modifierToken == null)
+            this.modifier = null;
+        else
+            this.modifier = modifierToken.getTokenType();
     }
 
     public abstract MethodEntry getCurrentMethod();
@@ -19,5 +24,9 @@ public abstract class ClassOrInterfaceEntry {
     public void addAttribute(AttributeEntry attribute) throws SemanticException {
         if(attributes.put(attribute.getName(), attribute) != null)
             throw new SemanticException("Duplicate attribute name");
+    }
+
+    protected Token.TokenType getModifier() {
+        return modifier;
     }
 }

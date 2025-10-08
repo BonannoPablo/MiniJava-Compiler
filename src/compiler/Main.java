@@ -6,6 +6,7 @@ import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
 import compiler.token.Token;
+import compiler.token.TokenImpl;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
 
@@ -103,7 +104,7 @@ public class Main {
         
     }
 
-    private static void runSemanticalAnalysis(){
-        
+    private static void runSemanticalAnalysis() throws SemanticException {
+        symbolTable.checkDeclarations();
     }
 }
