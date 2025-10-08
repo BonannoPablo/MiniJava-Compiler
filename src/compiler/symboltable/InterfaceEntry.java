@@ -3,6 +3,7 @@ package compiler.symboltable;
 import compiler.token.Token;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class InterfaceEntry extends ClassOrInterfaceEntry{
         this.token = token;
         name = token.getLexeme();
         methods = new LinkedList<>();
-        attributes = new LinkedList<>();
+        attributes = new HashMap<>();
     }
 
     public String getName() {
@@ -32,7 +33,7 @@ public class InterfaceEntry extends ClassOrInterfaceEntry{
         parent = interfaceClass;
     }
 
-    public MethodOrConstructor getCurrentMethod() {
+    public MethodEntry getCurrentMethod() {
         return currentMethod;
     }
 

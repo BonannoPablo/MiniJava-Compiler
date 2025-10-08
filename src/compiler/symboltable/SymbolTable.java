@@ -6,10 +6,11 @@ import compiler.token.TokenImpl;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 
 public class SymbolTable {
-    Hashtable<String, ClassEntry> classTable;
-    Hashtable<String, InterfaceEntry> interfaceTable;
+    Map<String, ClassEntry> classTable;
+    Map<String, InterfaceEntry> interfaceTable;
     ClassEntry currentClass;
     InterfaceEntry currentInterface;
 
@@ -25,15 +26,17 @@ public class SymbolTable {
             putClass(new StringEntry());
             putClass(new SystemEntry());
         } catch(SemanticException e){
-            //
+            //this exception shouldn't be reachable
         }
     }
 
     public ClassOrInterfaceEntry getCurrentClassOrInterface() {
         if(currentClass != null)
             return currentClass;
-        else
+        else if(currentInterface != null)
             return currentInterface;
+        else
+            return null;
     }
 
     public ClassEntry getCurrentClass() {
@@ -41,15 +44,18 @@ public class SymbolTable {
     }
 
     public void putClass(ClassEntry classItem) throws SemanticException {
-        if(classTable.put(classItem.getName(), classItem) == null){
+        if(classTable.put(classItem.getName(), classItem) != null){
             throw new SemanticException("Duplicate class");
         }
         currentClass = classItem;
         currentInterface = null;
     }
 
-    public void putInterface(InterfaceEntry interfaceItem){
-        interfaceTable.put(interfaceItem.getName(), interfaceItem);
+    public void putInterface(InterfaceEntry interfaceItem) throws SemanticException {
+        if(interfaceTable.put(interfaceItem.getName(), interfaceItem) != null){
+            throw new SemanticException("Duplicate interface");
+        }
+
         currentInterface = interfaceItem;
         currentClass = null;
     }
@@ -60,17 +66,11 @@ public class SymbolTable {
     }
 
     public void print() {
-        System.out.println("Class Table:");
-        for (Iterator<String> it = classTable.keys().asIterator(); it.hasNext(); ) {
-            String classEntry = it.next();
-            System.out.println("\t"+ classEntry);
+        for(ClassEntry c: classTable.values()){
+            System.out.println(c.toString());
         }
-
-        System.out.println("\n\nInterface Table:");
-        for (Iterator<String> it = interfaceTable.keys().asIterator(); it.hasNext(); ) {
-            String classEntry = it.next();
-            System.out.println("\t"+ classEntry);
+        for(InterfaceEntry i: interfaceTable.values()){
+            System.out.println(i.toString());
         }
-
     }
 }

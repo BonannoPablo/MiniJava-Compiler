@@ -12,7 +12,7 @@ import sourcemanager.SourceManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Queue;
-
+/*
 public class MainSyntactic {
     public static void main2(String[] args) {
         if (args.length != 1)
@@ -94,4 +94,4 @@ public class MainSyntactic {
         int z = 1;
 
     }
-}
+}*/

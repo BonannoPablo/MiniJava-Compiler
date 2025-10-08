@@ -17,4 +17,8 @@ public class AttributeEntry {
     public void setVisibility(Token visibility) {
         this.visibility = visibility;
     }
+
+    public String getName() {
+        return name;
+    }
 }

@@ -3,7 +3,6 @@ package compiler;
 import compiler.exceptions.*;
 import compiler.lexicalanalyzer.LexicalAnalyzer;
 import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
-import compiler.symboltable.SymbolTable;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
 import compiler.token.Token;
@@ -39,6 +38,8 @@ public class Main {
                 System.out.println(ex.getMessage());
                 System.out.println("[Error:" + ex.getLexeme() + "|" + ex.getLineNumber() + "]");
             }
+        } catch (SemanticException e) {
+            System.out.println(e.getMessage());
         }
         if(!exceptionFlag) {
             System.out.println("Compilation successful");
@@ -49,6 +50,8 @@ public class Main {
         } catch (IOException e) {
             System.out.println("There has been an error when reading the source file");
         }
+
+        symbolTable.print();
 
     }
 
@@ -76,6 +79,10 @@ public class Main {
         System.out.println("(" + token.getTokenType() + ", " + token.getLexeme() + ", " + token.getLineNumber() + ")");
     }
 
+
+
+
+
     private static void printLexicalException(LexicalException e) {
         final String RED = "\u001B[31m";
         final String RESET = "\u001B[0m";
@@ -93,8 +100,10 @@ public class Main {
             System.out.println("File " + filePath + " not found");
             System.exit(1);
         }
-        int x,y;
-        int z = 1;
+        
+    }
+
+    private static void runSemanticalAnalysis(){
         
     }
 }

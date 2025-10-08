@@ -2,24 +2,26 @@ package compiler.symboltable;
 
 import compiler.token.Token;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClassEntry extends ClassOrInterfaceEntry{
     String name;
     Token token;
-    MethodOrConstructor currentMethod;
+    MethodEntry currentMethod;
     Token implementedInterface;
     Token parent;
-    List<MethodEntry> methods;
-    List<ConstructorEntry> constructors;
+    Map<String, MethodEntry> methods;
+    Map<String, MethodEntry> constructors;
     Token genericType;
 
     public ClassEntry(Token token){
         this.token = token;
         name = token.getLexeme();
-        methods = new java.util.LinkedList<>();
-        constructors = new java.util.LinkedList<>();
-        attributes = new java.util.LinkedList<>();
+        methods = new HashMap<>();
+        constructors = new HashMap<>();
+        attributes = new HashMap<>();
     }
 
     public String getName(){
@@ -33,14 +35,14 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
 
     public void addMethod(MethodEntry method){
-        methods.add(method);
+        methods.put(method.getName(), method);
         currentMethod = method;
     }
-    public MethodOrConstructor getCurrentMethod() {
+    public MethodEntry getCurrentMethod() {
         return currentMethod;
     }
-    public void addConstructor(ConstructorEntry constructor){
-        constructors.add(constructor);
+    public void addConstructor(MethodEntry constructor){
+        constructors.put(constructor.getName(), constructor);
         currentMethod = constructor;
     }
 

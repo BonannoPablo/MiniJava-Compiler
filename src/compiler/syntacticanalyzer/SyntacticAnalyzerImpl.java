@@ -109,7 +109,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     }
 
-    private void interfaceStatement(Token modifier) throws LexicalException {
+    private void interfaceStatement(Token modifier) throws LexicalException, SemanticException {
         match(Token.TokenType.INTERFACE_WORD);
         Token classId = currentToken;
         match(Token.TokenType.CLASSID);
@@ -236,7 +236,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void memberList() throws LexicalException {
+    private void memberList() throws LexicalException, SemanticException {
         Token visibility = optionalVisibility();
         if (first(NonTerminal.ATTRIBUTE_OR_METHOD).contains(currentToken.getTokenType())){
             member(visibility);
@@ -258,7 +258,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }*/
     }
 
-    private void interfaceMemberList() throws LexicalException {
+    private void interfaceMemberList() throws LexicalException, SemanticException {
         Token visibility = optionalVisibility();
         if (first(NonTerminal.INTERFACE_MEMBER).contains(currentToken.getTokenType())) {
             interfaceMember(visibility);
@@ -268,7 +268,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void member(Token visibility) throws LexicalException {
+    private void member(Token visibility) throws LexicalException, SemanticException {
         if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
             Type type = primitiveType();
             Token metVarIdToken = currentToken;
@@ -307,7 +307,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void interfaceMember(Token visibility) throws LexicalException {
+    private void interfaceMember(Token visibility) throws LexicalException, SemanticException {
         if (first(NonTerminal.TYPE).contains(currentToken.getTokenType())) {
             Type type = type();
             Token metVarIdToken = currentToken;
@@ -344,14 +344,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void constructorOrMember(Token classIdToken, Token visibility) throws LexicalException {
+    private void constructorOrMember(Token classIdToken, Token visibility) throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.METVARID) || currentToken.getTokenType().equals(Token.TokenType.LESS_THAN)) {
             Type type = new ClassType(classIdToken, optionalGenerics());
             var metVarIdToken = currentToken;
             match(Token.TokenType.METVARID);
             closingAttributeMethod(type, metVarIdToken, visibility);
         } else if (first(NonTerminal.FORMAL_ARGS).contains(currentToken.getTokenType())) {
-            ConstructorEntry constructor = new ConstructorEntry(classIdToken);
+            MethodEntry constructor = new MethodEntry(classIdToken);
             symbolTable.getCurrentClass().addConstructor(constructor);
             formalArgs();
             block();
@@ -380,7 +380,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }*/
 
-    private void closingAttributeMethod(Type classId, Token metVarIdToken, Token visibility) throws LexicalException {
+    private void closingAttributeMethod(Type classId, Token metVarIdToken, Token visibility) throws LexicalException, SemanticException {
         if (first(NonTerminal.FORMAL_ARGS_AND_OPTIONAL_BLOCK).contains(currentToken.getTokenType())) {
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
             methodEntry.setReturnType(classId);
@@ -396,7 +396,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void closingAttributeMethodInterface(Token metVarIdToken, Type type, Token visibility) throws LexicalException {
+    private void closingAttributeMethodInterface(Token metVarIdToken, Type type, Token visibility) throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.EQUAL)) {
             match(Token.TokenType.EQUAL);
             compoundExpression();
@@ -513,7 +513,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return parameterList;
     }
 
-    private List<ParameterEntry> formalArgsList2(List<ParameterEntry> parameterList) throws LexicalException {
+    private void formalArgsList2(List<ParameterEntry> parameterList) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             match(Token.TokenType.COMMA);
             parameterList.addLast(formalArg());
@@ -521,7 +521,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         } else {
             //Empty production
         }
-        return parameterList;
     }
 
     private ParameterEntry formalArg() throws LexicalException {

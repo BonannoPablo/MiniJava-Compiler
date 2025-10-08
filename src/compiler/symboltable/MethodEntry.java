@@ -4,12 +4,13 @@ import compiler.token.Token;
 
 import java.util.List;
 
-public class MethodEntry extends MethodOrConstructor{
+public class MethodEntry{
     String name;
     Token token;
     Type returnType;
     Token modifier;
     Token visibility;
+    List<ParameterEntry> parameters;
 
     public MethodEntry(Token token){
         this.token = token;
@@ -29,4 +30,11 @@ public class MethodEntry extends MethodOrConstructor{
     }
 
 
+    public String getName() {
+        return name;
+    }
+
+    public void setParameters(List<ParameterEntry> parameterEntries) {
+        parameters = parameterEntries;
+    }
 }

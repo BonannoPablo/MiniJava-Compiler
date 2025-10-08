@@ -1,20 +1,23 @@
 package compiler.symboltable;
 
+import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class ClassOrInterfaceEntry {
     protected Token modifier;
-    List<AttributeEntry> attributes;
+    Map<String, AttributeEntry> attributes;
 
     public void setModifier(Token modifier) {
         this.modifier = modifier;
     }
 
-    public abstract MethodOrConstructor getCurrentMethod();
+    public abstract MethodEntry getCurrentMethod();
 
-    public void addAttribute(AttributeEntry attribute){
-        attributes.add(attribute);
+    public void addAttribute(AttributeEntry attribute) throws SemanticException {
+        if(attributes.put(attribute.getName(), attribute) != null)
+            throw new SemanticException("Duplicate attribute name");
     }
 }
