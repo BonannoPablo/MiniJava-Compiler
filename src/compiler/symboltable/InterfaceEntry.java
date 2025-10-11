@@ -1,5 +1,6 @@
 package compiler.symboltable;
 
+import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
 import java.util.ArrayList;
@@ -37,6 +38,11 @@ public class InterfaceEntry extends ClassOrInterfaceEntry{
         return currentMethod;
     }
 
+    @Override
+    public void consolidate() throws SemanticException {
+
+    }
+
     public void addMethod(MethodEntry method){
         methods.add(method);
         currentMethod = method;
@@ -44,5 +50,13 @@ public class InterfaceEntry extends ClassOrInterfaceEntry{
 
     public void checkCircularInheritance(ClassEntry classEntry) {
         //TODO
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setCurrentMethod(MethodEntry methodEntry) {
+        currentMethod = methodEntry;
     }
 }

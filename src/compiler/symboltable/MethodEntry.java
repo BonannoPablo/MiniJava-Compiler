@@ -2,8 +2,9 @@ package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
 import compiler.token.Token;
+import compiler.token.TokenImpl;
 
-import java.util.List;
+import java.util.*;
 
 import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 
@@ -14,17 +15,25 @@ public class MethodEntry{
     Token modifier;
     Token visibility;
     List<ParameterEntry> parameters;
+    Set<String> parametersNames;
+
 
     public MethodEntry(Token token){
         this.token = token;
         name = token.getLexeme();
+        visibility = new TokenImpl(Token.TokenType.PUBLIC_WORD, "public", -1);
+        parameters = new LinkedList<>();
+        parametersNames = new HashSet<>();
     }
 
     public void setReturnType(Type type) {
         returnType = type;
     }
 
-    public void setModifier(Token modifier) {
+    public void setModifier(Token modifier) throws SemanticException {
+        if(modifier != null && modifier.getTokenType() == Token.TokenType.ABSTRACT_WORD
+         && symbolTable.getCurrentClass().getModifier() != Token.TokenType.ABSTRACT_WORD)
+            throw new SemanticException("Cannot have abstract method in non abstract class", token);
         this.modifier = modifier;
     }
 
@@ -37,14 +46,69 @@ public class MethodEntry{
         return name;
     }
 
-    public void setParameters(List<ParameterEntry> parameterEntries) {
-        parameters = parameterEntries;
-    }
 
-    public void checkDeclaration() {
+    public void checkDeclaration() throws SemanticException {
+        if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID
+            && ! symbolTable.existsClass(returnType.getName())){
+            throw new SemanticException("Class does not exist", returnType.getToken());//TODO change msg
+        }
+
+        for(ParameterEntry parameter : parameters){
+            parameter.checkDeclaration();
+        }
+
     }
     public void checkConstructionDeclaration() throws SemanticException {
         if(!name.equals(symbolTable.getCurrentClass().getName()))
-            throw new SemanticException("Constructor should be named after class name");
+            throw new SemanticException("Constructor should be named after class name", token);
+
+        for(ParameterEntry parameter : parameters){
+            parameter.checkDeclaration();
+        }
+    }
+
+    public String print() {
+        String modifierName = modifier == null ? "none" : modifier.getLexeme();
+        String returnTypeString = returnType == null ? "none" : returnType.getName();
+        StringBuilder s = new StringBuilder(name + " : " + returnTypeString + " " + modifierName + " " + visibility.getLexeme() + "(");
+        for(ParameterEntry parameter : parameters){
+            s.append(parameter.type.getName()).append(" ").append(parameter.name) .append(", ");
+        }
+        s.append(")");
+        return s.toString();
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public boolean matchSignatures(MethodEntry m) {
+        boolean match = returnType.getName().equals(m.getReturnType().getName());
+        List<ParameterEntry> otherParameters = m.getParameters();
+        if(parameters.size() == otherParameters.size()) {
+            for (int i = 0; i < parameters.size() && match; i++)
+                match = parameters.get(i).getType().getName().equals(otherParameters.get(i).getType().getName());
+            return match;
+        }else{
+            return false;
+        }
+    }
+
+    public List<ParameterEntry> getParameters() {
+        return parameters;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public Token getModifier() {
+        return modifier;
+    }
+
+    public void addParameter(ParameterEntry parameterEntry) throws SemanticException {
+        if(!parametersNames.add(parameterEntry.getName()))
+            throw new SemanticException("Duplicate parameter name", parameterEntry.getToken());
+        parameters.addLast(parameterEntry);
     }
 }

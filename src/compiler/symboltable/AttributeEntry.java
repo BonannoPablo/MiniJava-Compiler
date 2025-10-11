@@ -14,7 +14,7 @@ public class AttributeEntry {
 
     public AttributeEntry(Token token, Type type) {
         this.token = token;
-        this.name = token.getLexeme();
+        this.name = symbolTable.getCurrentClass().getName() + token.getLexeme();
         this.type = type;
         this.visibility = new TokenImpl(Token.TokenType.PUBLIC_WORD, "public", -1);
     }
@@ -30,6 +30,14 @@ public class AttributeEntry {
     public void checkDeclaration() throws SemanticException {
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID
          && ! symbolTable.existsClass(type.getName()))
-            throw new SemanticException("Class not found");
+            throw new SemanticException("Class not found", type.getToken());
+    }
+
+    public String print() {
+        return name + " : " + type.getName() + " " + visibility.getLexeme();
+    }
+
+    public Token getToken() {
+        return token;
     }
 }

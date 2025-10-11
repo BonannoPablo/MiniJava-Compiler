@@ -17,7 +17,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
     Token implementedInterface;
     Token parent;
     Map<String, MethodEntry> methods;
-    Map<String, MethodEntry> constructors;
+    Map<Integer, MethodEntry> constructors;
     Token genericType;
 
     public ClassEntry(Token token){
@@ -39,21 +39,72 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
 
 
-    public void addMethod(MethodEntry method){
-        methods.put(method.getName(), method);
+    public void addMethod(MethodEntry method) throws SemanticException {
+        String methodNameAndArity = method.getName() + method.getParameters().size();
+        if(methods.put(methodNameAndArity, method) != null)
+            throw new SemanticException("Duplicate method name", method.getToken());
         currentMethod = method;
     }
     public MethodEntry getCurrentMethod() {
         return currentMethod;
     }
-    public void addConstructor(MethodEntry constructor){
-        constructors.put(constructor.getName(), constructor);
+
+    @Override
+    public void consolidate() throws SemanticException {
+        if(consolidated || name.equals("Object"))
+            return;
+        ClassEntry parentClass = symbolTable.getClassEntry(parent);
+        parentClass.consolidate();
+        for(MethodEntry method : parentClass.getMethods()){
+            Token.TokenType methodModifier = method.getModifier() == null ? null : method.getModifier().getTokenType();
+            String methodNameAndArity = method.getName() + method.getParameters().size();
+            MethodEntry oldMethod = methods.put(methodNameAndArity, method);
+            if(oldMethod != null){
+                boolean signatureMatch = method.matchSignatures(oldMethod);
+                boolean modifierFinalOrStatic = method.getModifier() != null && (method.getModifier().getTokenType() == FINAL_WORD || method.getModifier().getTokenType() == STATIC_WORD);
+                if(!signatureMatch)
+                    throw new SemanticException("Duplicate method", oldMethod.getToken());
+                else if(modifierFinalOrStatic)
+                    throw new SemanticException("Cannot override final or static method", oldMethod.getToken());
+                else if(oldMethod.getModifier() != null && oldMethod.getModifier().getTokenType() == STATIC_WORD)
+                    throw new SemanticException("Static method cannot override non static method", oldMethod.getToken());
+                else {
+                    String oldMethodNameAndArity = oldMethod.getName() + oldMethod.getParameters().size();
+                    methods.put(oldMethodNameAndArity, oldMethod);
+                }
+            } else{
+                if(methodModifier == ABSTRACT_WORD && modifier != ABSTRACT_WORD)
+                    throw new SemanticException("Class is not abstract and does not override abstract method in parent", token);
+            }
+
+        }
+        for(AttributeEntry attribute : parentClass.getAttributes()){
+            AttributeEntry a = attributes.put(attribute.getName(), attribute);
+            if(a != null)
+                throw new SemanticException("Duplicate attribute", a.getToken());
+        }
+        consolidated = true;
+    }
+
+    private Iterable<AttributeEntry> getAttributes() {
+        return attributes.values();
+    }
+
+    private Iterable<MethodEntry> getMethods() {
+        return methods.values();
+    }
+
+    public void addConstructor(MethodEntry constructor) throws SemanticException {
+        if(modifier == ABSTRACT_WORD)
+            throw new SemanticException("Abstract class cannot have constructors", constructor.getToken());
+        if(constructors.put(constructor.getParameters().size(), constructor) != null)
+            throw new SemanticException("Constructor already defined", constructor.getToken());
         currentMethod = constructor;
     }
 
     public void setParent(Token parent) throws SemanticException {
         if(parent.getLexeme().equals(token.getLexeme()))
-            throw new SemanticException("Cannot inherit from itself");
+            throw new SemanticException("Cannot inherit from itself", token);
         this.parent = parent;
     }
 
@@ -67,31 +118,32 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         if(parent != null) {
             ClassEntry parentClass = symbolTable.getClassEntry(parent);
             if(parentClass != null) {
-                parentClass.checkCircularInheritance(this);
+                if(parentClass.checkCircularInheritance(this))
+                    throw new SemanticException("Illegal cyclic inheritance", token);
                 Token.TokenType parentModifier = parentClass.getModifier();
+                if(parentModifier == FINAL_WORD)
+                    throw new SemanticException("Cannot inherit from final class", token);
+                if(parentModifier == STATIC_WORD)
+                    throw new SemanticException("Cannot inherit from static class", token);
                 checkAbstractInheritance(parentModifier);
-                if(parentModifier == FINAL_WORD || parentModifier == STATIC_WORD)
-                    throw new SemanticException("Cannot inherit from final class");
             }
             else
-                throw new SemanticException("Parent class not found");
+                throw new SemanticException("Parent class not found", parent);
 
         } else if(implementedInterface != null){
             InterfaceEntry interfaceObject = symbolTable.existsInterface(implementedInterface);
             if(interfaceObject != null)
                 interfaceObject.checkCircularInheritance(this);
             else
-                throw new SemanticException("Interface not found");
+                throw new SemanticException("Interface not found", implementedInterface);
         }
 
         for(MethodEntry method : methods.values()){
             method.checkDeclaration();
         }
 
-        if(!constructors.isEmpty() && modifier == ABSTRACT_WORD)
-            throw new SemanticException("Cannot have abstract constructors");
         for(MethodEntry constructor : constructors.values()){
-            constructor.checkDeclaration();
+            constructor.checkConstructionDeclaration();
         }
         for(AttributeEntry attribute : attributes.values()){
             attribute.checkDeclaration();
@@ -105,16 +157,42 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         else
             modifierTokenType = null;
 
-        if(parentModifier != ABSTRACT_WORD && modifierTokenType == ABSTRACT_WORD)
-            throw new SemanticException("Abstract class cannot inherit from concrete class");
+        if(parentModifier != ABSTRACT_WORD && modifierTokenType == ABSTRACT_WORD && !parent.getLexeme().equals("Object"))
+            throw new SemanticException("Abstract class cannot inherit from concrete class", token);
     }
 
-    private void checkCircularInheritance(ClassEntry classEntry) throws SemanticException {
+    private boolean checkCircularInheritance(ClassEntry classEntry){
         if(name.equals("Object"))
-            return;
+            return false;
         if(name.equals(classEntry.name))
-            throw new SemanticException("Illegal cyclic inheritance");
+            return true;
         ClassEntry parentClass = symbolTable.getClassEntry(parent);
-        parentClass.checkCircularInheritance(classEntry);
+        return parentClass.checkCircularInheritance(classEntry);
+    }
+
+    public String print() {
+        String interfaceName = implementedInterface == null ? "none" : implementedInterface.getLexeme();
+        String genericName = genericType == null ? "none" : genericType.getLexeme();
+        StringBuilder s = new StringBuilder(name + "\nGeneric: " + genericName + "\nParent: " + parent.getLexeme() + "\nInterface: " + interfaceName + "\n---Attributes---\n");
+        for (AttributeEntry attribute : attributes.values()) {
+            s.append(attribute.print()).append("\n");
+        }
+        s.append("---Methods---\n");
+        for (MethodEntry method : methods.values()) {
+            s.append(method.print()).append("\n");
+        }
+        s.append("---Constructors---\n");
+        for (MethodEntry constructor : constructors.values()) {
+            s.append(constructor.print()).append("\n");
+        }
+        return s.toString();
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setCurrentMethod(MethodEntry methodEntry) {
+        currentMethod = methodEntry;
     }
 }

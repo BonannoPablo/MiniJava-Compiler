@@ -44,8 +44,9 @@ public class SymbolTable {
     }
 
     public void putClass(ClassEntry classItem) throws SemanticException {
-        if(classTable.put(classItem.getName(), classItem) != null){
-            throw new SemanticException("Duplicate class");
+        ClassEntry classEntry = classTable.put(classItem.getName(), classItem);
+        if(classEntry != null){
+            throw new SemanticException("Duplicate class", classItem.getToken());
         }
         currentClass = classItem;
         currentInterface = null;
@@ -53,7 +54,7 @@ public class SymbolTable {
 
     public void putInterface(InterfaceEntry interfaceItem) throws SemanticException {
         if(interfaceTable.put(interfaceItem.getName(), interfaceItem) != null){
-            throw new SemanticException("Duplicate interface");
+            throw new SemanticException("Duplicate interface", interfaceItem.getToken());
         }
 
         currentInterface = interfaceItem;
@@ -67,7 +68,7 @@ public class SymbolTable {
 
     public void print() {
         for(ClassEntry c: classTable.values()){
-            System.out.println(c.toString());
+            System.out.println(c.print());
         }
         for(InterfaceEntry i: interfaceTable.values()){
             System.out.println(i.toString());
@@ -91,5 +92,14 @@ public class SymbolTable {
 
     public boolean existsClass(String name) {
         return classTable.containsKey(name);
+    }
+
+    public void consolidate() throws SemanticException {
+        for(ClassEntry c: classTable.values()){
+            c.consolidate();
+        }
+        for(InterfaceEntry i: interfaceTable.values()){
+            i.consolidate();
+        }
     }
 }

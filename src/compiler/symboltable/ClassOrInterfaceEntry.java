@@ -10,6 +10,7 @@ public abstract class ClassOrInterfaceEntry {
     protected Token modifierToken;
     protected Token.TokenType modifier;
     Map<String, AttributeEntry> attributes;
+    protected boolean consolidated = false;
 
     public void setModifier(Token modifierToken) {
         this.modifierToken = modifierToken;
@@ -24,14 +25,15 @@ public abstract class ClassOrInterfaceEntry {
     public void addAttribute(AttributeEntry attribute) throws SemanticException {
         AttributeEntry attributeEntry = attributes.put(attribute.getName(), attribute);
         if(attributeEntry != null)
-            throw new SemanticException("Duplicate attribute name");
+            throw new SemanticException("Duplicate attribute name", attribute.getToken());
     }
 
     protected Token.TokenType getModifier() {
         return modifier;
     }
 
-    protected boolean hasAttribute(AttributeEntry attribute) {
-        return attributes.containsKey(attribute.getName());
-    }
+
+    public abstract void consolidate() throws SemanticException;
+
+
 }

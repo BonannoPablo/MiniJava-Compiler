@@ -6,7 +6,6 @@ import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
 import compiler.token.Token;
-import compiler.token.TokenImpl;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
 
@@ -29,18 +28,19 @@ public class Main {
         boolean exceptionFlag = false;
         try{
             syntacticAnalyzer.start();
+            runSemanticAnalysis();
+
         } catch(LexicalException e){
             printLexicalException(e);
+            exceptionFlag = true;
         } catch(SyntacticExceptions e){
             exceptionFlag = true;
-            Queue<SyntacticException> exceptionQueue = e.getExceptionsQueue();
-            while(!exceptionQueue.isEmpty()) {
-                SyntacticException ex = exceptionQueue.poll();
-                System.out.println(ex.getMessage());
-                System.out.println("[Error:" + ex.getLexeme() + "|" + ex.getLineNumber() + "]");
-            }
+            printSyntacticException(e);
         } catch (SemanticException e) {
+            System.out.print("Semantic error in line " + e.getToken().getLineNumber() + ": ");
             System.out.println(e.getMessage());
+            System.out.println("[Error:" + e.getToken().getLexeme() + "|" + e.getToken().getLineNumber() + "]");
+            exceptionFlag = true;
         }
         if(!exceptionFlag) {
             System.out.println("Compilation successful");
@@ -52,8 +52,19 @@ public class Main {
             System.out.println("There has been an error when reading the source file");
         }
 
-        symbolTable.print();
 
+        //symbolTable.print();
+
+    }
+
+    private static void printSyntacticException(SyntacticExceptions e) {
+        Queue<SyntacticException> exceptionQueue = e.getExceptionsQueue();
+        while(!exceptionQueue.isEmpty()) {
+            SyntacticException ex = exceptionQueue.poll();
+            System.out.print("Syntactic error in line " + ex.getLineNumber() + ": ");
+            System.out.println(ex.getMessage());
+            System.out.println("[Error:" + ex.getLexeme() + "|" + ex.getLineNumber() + "]");
+        }
     }
 
     private static void runLexicalAnalyzer(SourceManager sourceManager) {
@@ -81,9 +92,6 @@ public class Main {
     }
 
 
-
-
-
     private static void printLexicalException(LexicalException e) {
         final String RED = "\u001B[31m";
         final String RESET = "\u001B[0m";
@@ -104,7 +112,8 @@ public class Main {
         
     }
 
-    private static void runSemanticalAnalysis() throws SemanticException {
+    private static void runSemanticAnalysis() throws SemanticException {
         symbolTable.checkDeclarations();
+        symbolTable.consolidate();
     }
 }
