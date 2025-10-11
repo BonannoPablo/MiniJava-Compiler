@@ -10,17 +10,15 @@ import java.util.Map;
 import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 import static compiler.token.Token.TokenType.*;
 
-public class ClassEntry extends ClassOrInterfaceEntry{
-    String name;
-    Token token;
-    MethodEntry currentMethod;
-    Token implementedInterface;
-    Token parent;
-    Token parentGenericType;
-    Map<String, MethodEntry> methods;
-    Map<Integer, MethodEntry> constructors;
-    Token genericType;
-    Token[] genericTypeMap;
+public class ClassEntry extends TopLevelEntry {
+    private String name;
+    private Token token;
+    private Token implementedInterface;
+    private Token parent;
+    private Token parentGenericType;
+    private Map<Integer, MethodEntry> constructors;
+    private Token genericType;
+    private Token[] genericTypeMap;
 
     public ClassEntry(Token token){
         this.token = token;
@@ -93,7 +91,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
     }
 
     private void checkImplementedMethods() throws SemanticException {
-        if(implementedInterface != null){
+        if(implementedInterface != null && modifier != ABSTRACT_WORD){
             InterfaceEntry interfaceObject = symbolTable.getInterface(implementedInterface);
             for(MethodEntry method : interfaceObject.getMethods()){
                 String methodToImplementName = method.getParameters().size() + method.getName();

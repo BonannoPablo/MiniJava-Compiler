@@ -3,14 +3,15 @@ package compiler.symboltable;
 import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
-import java.util.List;
 import java.util.Map;
 
-public abstract class ClassOrInterfaceEntry {
+public abstract class TopLevelEntry {
     protected Token modifierToken;
     protected Token.TokenType modifier;
-    Map<String, AttributeEntry> attributes;
+    protected Map<String, AttributeEntry> attributes;
     protected boolean consolidated = false;
+    protected Map<String, MethodEntry> methods;
+    protected MethodEntry currentMethod;
 
     public void setModifier(Token modifierToken) {
         this.modifierToken = modifierToken;

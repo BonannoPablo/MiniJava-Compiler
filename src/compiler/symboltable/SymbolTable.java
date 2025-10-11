@@ -30,7 +30,7 @@ public class SymbolTable {
         }
     }
 
-    public ClassOrInterfaceEntry getCurrentClassOrInterface() {
+    public TopLevelEntry getCurrentClassOrInterface() {
         if(currentClass != null)
             return currentClass;
         else if(currentInterface != null)

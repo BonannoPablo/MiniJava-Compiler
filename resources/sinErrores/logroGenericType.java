@@ -1,3 +1,4 @@
+///[SinErrores]
 class Box<T> {
     T value;
     void set(T v) { value = v; }

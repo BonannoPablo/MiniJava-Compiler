@@ -9,13 +9,11 @@ import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 import static compiler.token.Token.TokenType.FINAL_WORD;
 import static compiler.token.Token.TokenType.STATIC_WORD;
 
-public class InterfaceEntry extends ClassOrInterfaceEntry{
+public class InterfaceEntry extends TopLevelEntry {
     private String name;
     private Token token;
     private Token genericType;
     private Token parent;
-    private MethodEntry currentMethod;
-    Map<String, MethodEntry> methods;
 
     public InterfaceEntry(Token token){
         this.token = token;

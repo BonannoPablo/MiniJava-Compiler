@@ -1,4 +1,4 @@
-
+///[SinErrores]
 class A {
     void f(int x) { }
 }
