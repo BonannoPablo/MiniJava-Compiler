@@ -44,19 +44,19 @@ public class SymbolTable {
     }
 
     public void putClass(ClassEntry classItem) throws SemanticException {
-        ClassEntry classEntry = classTable.put(classItem.getName(), classItem);
-        if(classEntry != null){
+        if(interfaceTable.containsKey(classItem.getName()) || classTable.containsKey(classItem.getName()))
             throw new SemanticException("Duplicate class", classItem.getToken());
-        }
+
+        classTable.put(classItem.getName(), classItem);
         currentClass = classItem;
         currentInterface = null;
     }
 
     public void putInterface(InterfaceEntry interfaceItem) throws SemanticException {
-        if(interfaceTable.put(interfaceItem.getName(), interfaceItem) != null){
+        if(interfaceTable.containsKey(interfaceItem.getName()) || classTable.containsKey(interfaceItem.getName())){
             throw new SemanticException("Duplicate interface", interfaceItem.getToken());
         }
-
+        interfaceTable.put(interfaceItem.getName(), interfaceItem);
         currentInterface = interfaceItem;
         currentClass = null;
     }

@@ -1,5 +1,4 @@
-///[Error:x|7]
-//
+
 class A {
     int x;
 }
