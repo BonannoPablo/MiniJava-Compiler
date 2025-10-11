@@ -1,11 +1,11 @@
 package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
+import compiler.symboltable.types.ClassType;
+import compiler.symboltable.types.PrimitiveType;
+import compiler.symboltable.types.Type;
 import compiler.token.Token;
 import compiler.token.TokenImpl;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class SystemEntry extends ClassEntry{
 

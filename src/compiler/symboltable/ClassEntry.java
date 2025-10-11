@@ -161,7 +161,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
                 if(! symbolTable.getClassEntry(parent).hasGenericType())
                     throw new SemanticException("Parent class does not take generic parameter", parentGenericType);
             }else{
-
+                if (symbolTable.getClassEntry(parent).getGenericType() != null)
+                    throw new SemanticException("Raw type not allowed. Must specify generic type", parent);
             }
 
 

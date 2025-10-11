@@ -1,13 +1,10 @@
 package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
+import compiler.symboltable.types.PrimitiveType;
+import compiler.symboltable.types.Type;
 import compiler.token.Token;
 import compiler.token.TokenImpl;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 
 public class ObjectEntry extends  ClassEntry{
     public ObjectEntry() {

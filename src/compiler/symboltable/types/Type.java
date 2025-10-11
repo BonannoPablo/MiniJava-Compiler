@@ -1,4 +1,4 @@
-package compiler.symboltable;
+package compiler.symboltable.types;
 
 import compiler.token.Token;
 

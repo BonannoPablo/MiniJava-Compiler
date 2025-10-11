@@ -1,6 +1,7 @@
 package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
+import compiler.symboltable.types.Type;
 import compiler.token.Token;
 
 import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
