@@ -80,13 +80,18 @@ public class SymbolTable {
             currentClass = c;
             c.checkDeclaration();
         }
+
+        for(InterfaceEntry i: interfaceTable.values()){
+            currentInterface = i;
+            i.checkDeclaration();
+        }
     }
 
     public ClassEntry getClassEntry(Token parent) {
         return classTable.get(parent.getLexeme());
     }
 
-    public InterfaceEntry existsInterface(Token parent) {
+    public InterfaceEntry getInterface(Token parent) {
         return interfaceTable.get(parent.getLexeme());
     }
 
@@ -101,5 +106,9 @@ public class SymbolTable {
         for(InterfaceEntry i: interfaceTable.values()){
             i.consolidate();
         }
+    }
+
+    public InterfaceEntry getInterfaceEntry(Token parent) {
+        return interfaceTable.get(parent.getLexeme());
     }
 }

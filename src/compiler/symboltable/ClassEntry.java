@@ -40,8 +40,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
 
     public void addMethod(MethodEntry method) throws SemanticException {
-        String methodNameAndArity = method.getName() + method.getParameters().size();
-        if(methods.put(methodNameAndArity, method) != null)
+        String methodArityAndName = method.getParameters().size() + method.getName();
+        if(methods.put(methodArityAndName, method) != null)
             throw new SemanticException("Duplicate method name", method.getToken());
         currentMethod = method;
     }
@@ -57,8 +57,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         parentClass.consolidate();
         for(MethodEntry method : parentClass.getMethods()){
             Token.TokenType methodModifier = method.getModifier() == null ? null : method.getModifier().getTokenType();
-            String methodNameAndArity = method.getName() + method.getParameters().size();
-            MethodEntry oldMethod = methods.put(methodNameAndArity, method);
+            String methodArityAndName = method.getParameters().size() + method.getName();
+            MethodEntry oldMethod = methods.put(methodArityAndName, method);
             if(oldMethod != null){
                 boolean signatureMatch = method.matchSignatures(oldMethod);
                 boolean modifierFinalOrStatic = method.getModifier() != null && (method.getModifier().getTokenType() == FINAL_WORD || method.getModifier().getTokenType() == STATIC_WORD);
@@ -69,8 +69,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
                 else if(oldMethod.getModifier() != null && oldMethod.getModifier().getTokenType() == STATIC_WORD)
                     throw new SemanticException("Static method cannot override non static method", oldMethod.getToken());
                 else {
-                    String oldMethodNameAndArity = oldMethod.getName() + oldMethod.getParameters().size();
-                    methods.put(oldMethodNameAndArity, oldMethod);
+                    String oldMethodArityAndName = oldMethod.getParameters().size() + oldMethod.getName();
+                    methods.put(oldMethodArityAndName, oldMethod);
                 }
             } else{
                 if(methodModifier == ABSTRACT_WORD && modifier != ABSTRACT_WORD)
@@ -84,13 +84,31 @@ public class ClassEntry extends ClassOrInterfaceEntry{
                 throw new SemanticException("Duplicate attribute", a.getToken());
         }
         consolidated = true;
+        checkImplementedMethods();
     }
 
-    private Iterable<AttributeEntry> getAttributes() {
+    private void checkImplementedMethods() throws SemanticException {
+        if(implementedInterface != null){
+            InterfaceEntry interfaceObject = symbolTable.getInterface(implementedInterface);
+            for(MethodEntry method : interfaceObject.getMethods()){
+                String methodToImplementName = method.getParameters().size() + method.getName();
+                if(methods.containsKey(methodToImplementName)){
+                    MethodEntry methodEntry = methods.get(methodToImplementName);
+                    if(! method.matchSignatures(methodEntry)){
+                        throw new SemanticException("Class should implement all interface methods", token);
+                    }
+                } else {
+                    throw new SemanticException("Class should implement all interface methods", token);
+                }
+            }
+        }
+    }
+
+    public Iterable<AttributeEntry> getAttributes() {
         return attributes.values();
     }
 
-    private Iterable<MethodEntry> getMethods() {
+    public Iterable<MethodEntry> getMethods() {
         return methods.values();
     }
 
@@ -131,10 +149,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
                 throw new SemanticException("Parent class not found", parent);
 
         } else if(implementedInterface != null){
-            InterfaceEntry interfaceObject = symbolTable.existsInterface(implementedInterface);
-            if(interfaceObject != null)
-                interfaceObject.checkCircularInheritance(this);
-            else
+            InterfaceEntry interfaceObject = symbolTable.getInterface(implementedInterface);
+            if(interfaceObject == null)
                 throw new SemanticException("Interface not found", implementedInterface);
         }
 
