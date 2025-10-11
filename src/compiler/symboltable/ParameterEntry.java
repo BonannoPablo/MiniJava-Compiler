@@ -17,9 +17,11 @@ public class ParameterEntry {
     }
 
     public void checkDeclaration() throws SemanticException {
+        Token genericType = symbolTable.getCurrentClass().getGenericType();
+        boolean genericTypeMatch = genericType != null && type.getToken().getLexeme().equals(genericType.getLexeme());
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID
-        && ! symbolTable.existsClass(type.getName()))
-            throw new SemanticException("Class does not exist", type.getToken()); //TODO change msg
+        && ! (symbolTable.existsClass(type.getName()) || genericTypeMatch))
+                throw new SemanticException("Class does not exist", type.getToken()); //TODO change msg
     }
 
     public Type getType() {

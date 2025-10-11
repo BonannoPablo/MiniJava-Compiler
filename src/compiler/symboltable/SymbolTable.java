@@ -111,4 +111,8 @@ public class SymbolTable {
     public InterfaceEntry getInterfaceEntry(Token parent) {
         return interfaceTable.get(parent.getLexeme());
     }
+
+    public void setCurrentClass(ClassEntry classEntry) {
+        currentClass = classEntry;
+    }
 }

@@ -16,9 +16,11 @@ public class ClassEntry extends ClassOrInterfaceEntry{
     MethodEntry currentMethod;
     Token implementedInterface;
     Token parent;
+    Token parentGenericType;
     Map<String, MethodEntry> methods;
     Map<Integer, MethodEntry> constructors;
     Token genericType;
+    Token[] genericTypeMap;
 
     public ClassEntry(Token token){
         this.token = token;
@@ -27,6 +29,8 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         constructors = new HashMap<>();
         attributes = new HashMap<>();
         parent = new TokenImpl(Token.TokenType.CLASSID, "Object", -1);
+        parentGenericType = null;
+        genericTypeMap = null;
     }
 
     public String getName(){
@@ -55,6 +59,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
             return;
         ClassEntry parentClass = symbolTable.getClassEntry(parent);
         parentClass.consolidate();
+        symbolTable.setCurrentClass(this);
         for(MethodEntry method : parentClass.getMethods()){
             Token.TokenType methodModifier = method.getModifier() == null ? null : method.getModifier().getTokenType();
             String methodArityAndName = method.getParameters().size() + method.getName();
@@ -133,6 +138,7 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
 
     public void checkDeclaration() throws SemanticException {
+        symbolTable.setCurrentClass(this);
         if(parent != null) {
             ClassEntry parentClass = symbolTable.getClassEntry(parent);
             if(parentClass != null) {
@@ -148,11 +154,24 @@ public class ClassEntry extends ClassOrInterfaceEntry{
             else
                 throw new SemanticException("Parent class not found", parent);
 
+            if(parentGenericType != null && genericType == null) {
+                if(!symbolTable.existsClass(parentGenericType.getLexeme()))
+                    throw new SemanticException("Cannot find symbol", parentGenericType);
+            }else if(parentGenericType != null){
+                if(! symbolTable.getClassEntry(parent).hasGenericType())
+                    throw new SemanticException("Parent class does not take generic parameter", parentGenericType);
+            }else{
+
+            }
+
+
         } else if(implementedInterface != null){
             InterfaceEntry interfaceObject = symbolTable.getInterface(implementedInterface);
             if(interfaceObject == null)
                 throw new SemanticException("Interface not found", implementedInterface);
         }
+
+        initializeGenericTypeMap();
 
         for(MethodEntry method : methods.values()){
             method.checkDeclaration();
@@ -164,6 +183,22 @@ public class ClassEntry extends ClassOrInterfaceEntry{
         for(AttributeEntry attribute : attributes.values()){
             attribute.checkDeclaration();
         }
+    }
+
+    private void initializeGenericTypeMap() {
+        if(parentGenericType != null) {
+            genericTypeMap = new Token[2];
+            genericTypeMap[0] = symbolTable.getClassEntry(parent).getGenericType();
+            genericTypeMap[1] = parentGenericType;
+        }
+    }
+
+    public Token[] getGenericTypeMap() {
+        return genericTypeMap;
+    }
+
+    public boolean hasGenericType() {
+        return genericType != null;
     }
 
     private void checkAbstractInheritance(Token.TokenType parentModifier) throws SemanticException {
@@ -210,5 +245,13 @@ public class ClassEntry extends ClassOrInterfaceEntry{
 
     public void setCurrentMethod(MethodEntry methodEntry) {
         currentMethod = methodEntry;
+    }
+
+    public void setParentGenericType(Token token) {
+        this.parentGenericType = token;
+    }
+
+    public Token getGenericType() {
+        return genericType;
     }
 }

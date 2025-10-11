@@ -32,7 +32,8 @@ public class MethodEntry{
 
     public void setModifier(Token modifier) throws SemanticException {
         if(modifier != null && modifier.getTokenType() == Token.TokenType.ABSTRACT_WORD
-         && symbolTable.getCurrentClass().getModifier() != Token.TokenType.ABSTRACT_WORD)
+         && symbolTable.getCurrentClassOrInterface() instanceof ClassEntry
+         && symbolTable.getCurrentClassOrInterface().getModifier() != Token.TokenType.ABSTRACT_WORD)
             throw new SemanticException("Cannot have abstract method in non abstract class", token);
         this.modifier = modifier;
     }
@@ -48,8 +49,9 @@ public class MethodEntry{
 
 
     public void checkDeclaration() throws SemanticException {
+        Token genericType = symbolTable.getCurrentClass().getGenericType();
         if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID
-            && ! symbolTable.existsClass(returnType.getName())){
+            && ! (symbolTable.existsClass(returnType.getName()) || (genericType != null &&  returnType.getName().equals(genericType.getLexeme())))){
             throw new SemanticException("Class does not exist", returnType.getToken());//TODO change msg
         }
 
@@ -83,11 +85,16 @@ public class MethodEntry{
     }
 
     public boolean matchSignatures(MethodEntry m) {
-        boolean match = returnType.getName().equals(m.getReturnType().getName());
+        Token[] genericTypeMap = symbolTable.getCurrentClass().getGenericTypeMap();
+        boolean match = returnType.getName().equals(m.getReturnType().getName()) ||
+                (genericTypeMap != null && returnType.getName().equals(genericTypeMap[0].getLexeme())               //TODO refactor this pls omg
+                && m.getReturnType().getName().equals(genericTypeMap[1].getLexeme()) );
         List<ParameterEntry> otherParameters = m.getParameters();
         if(parameters.size() == otherParameters.size()) {
             for (int i = 0; i < parameters.size() && match; i++)
-                match = parameters.get(i).getType().getName().equals(otherParameters.get(i).getType().getName());
+                match = parameters.get(i).getType().getName().equals(otherParameters.get(i).getType().getName())
+                        || (genericTypeMap != null && parameters.get(i).getType().getName().equals(genericTypeMap[0].getLexeme())
+                && otherParameters.get(i).getType().getName().equals(genericTypeMap[1].getLexeme()));
             return match;
         }else{
             return false;

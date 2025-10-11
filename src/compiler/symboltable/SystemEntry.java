@@ -13,7 +13,6 @@ public class SystemEntry extends ClassEntry{
         super(new TokenImpl(Token.TokenType.CLASSID, "System", -1));
         generateMethods();
     }
-    //TODO implement System methods entries
 
     private void generateMethods() {
         Type voidType = new PrimitiveType(new TokenImpl(Token.TokenType.VOID_WORD, "void", -1));
@@ -137,5 +136,14 @@ public class SystemEntry extends ClassEntry{
         }catch(Exception e){
             //This catch block shouldn't be reachable
         }
+    }
+
+    @Override
+    public void consolidate() {
+        //No need to do anything to consolidate Object Class
+    }
+
+    public void checkDeclaration() throws SemanticException {
+        //No need to check declaration
     }
 }

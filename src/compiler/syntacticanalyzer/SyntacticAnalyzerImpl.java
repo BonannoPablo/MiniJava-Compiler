@@ -169,7 +169,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 var parentClass = currentToken;
                 match(Token.TokenType.CLASSID);
                 symbolTable.getCurrentClass().setParent(parentClass);
-                optionalGenerics();
+                symbolTable.getCurrentClass().setParentGenericType(optionalGenerics());
                 break;
             case Token.TokenType.IMPLEMENTS_WORD:
                 retrieveNextToken();
@@ -314,7 +314,12 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setVisibility(visibility);
             methodEntry.setModifier(modifier);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
-            formalArgsAndOptionalBlock();
+            boolean modifierIsStatic = (modifier != null && modifier.getTokenType() == Token.TokenType.STATIC_WORD);
+            boolean hasBody = formalArgsAndOptionalBlock();
+            if(hasBody && !modifierIsStatic)
+                throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
+            if(!hasBody && modifierIsStatic)
+                throw new SemanticException("Interface static methods must have body", metVarIdToken);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else if (currentToken.getTokenType().equals(Token.TokenType.VOID_WORD)) {
             Token voidWord = currentToken;
@@ -326,7 +331,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(new PrimitiveType(voidWord));
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
-            formalArgsAndOptionalBlock();
+            if(formalArgsAndOptionalBlock())
+                throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else {
             if (!panicMode) {
@@ -405,7 +411,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(type);
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
-            formalArgsAndOptionalBlock();
+            if(formalArgsAndOptionalBlock())
+                throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else {
             if (!panicMode) {

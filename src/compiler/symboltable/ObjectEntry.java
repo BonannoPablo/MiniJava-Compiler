@@ -31,6 +31,11 @@ public class ObjectEntry extends  ClassEntry{
     }
 
     @Override
-    public void consolidate() { //No need to do anything to consolidate Object Class
+    public void consolidate() {
+        //No need to do anything to consolidate Object Class
+    }
+
+    public void checkDeclaration() throws SemanticException {
+        //No need to check declaration
     }
 }

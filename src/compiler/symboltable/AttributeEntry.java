@@ -28,8 +28,9 @@ public class AttributeEntry {
     }
 
     public void checkDeclaration() throws SemanticException {
+        Token genericType = symbolTable.getCurrentClass().getGenericType();
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID
-         && ! symbolTable.existsClass(type.getName()))
+         && ! (symbolTable.existsClass(type.getName()) ||  (genericType != null &&  type.getName().equals(genericType.getLexeme())) ) )
             throw new SemanticException("Class not found", type.getToken());
     }
 
