@@ -20,7 +20,7 @@ Obs. el carácter  es la cadena vacía
 
 <GenericidadOpcional> ::= <  idClase  > | 
 
-<ListaMiembros> ::= <VisibilidadOpcional> <AtributoOMetodo> <ListaMiembros> | 
+<ListaMiembros> ::= <VisibilidadOpcional> <Miembro> <ListaMiembros> | 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
 
 <Miembro> ::= <TipoPrimitivo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 

@@ -1,0 +1,26 @@
+Siguientes
+
+ListaClasesEInterfaces = {eof}
+ModificadorOpcional = Primeros(ListaClasesEInterfaces2) = {class, interface}
+VisibilidadOpcional = Primeros(Miembro) U Primeros(MiembroInterfaz)
+HerenciaOpcional = { { }
+ExtendsOpcional = {  {  }
+GenericidadODiamanteOpcional = Primeros(ArgsActuales) = { ( }
+IdClaseOpcional = { > }
+#GenericidadOpcional = Primeros(HerenciaOpcional) U { { } U Primeros(ExtendsOpcional) U Siguientes(HerenciaOpcional) U Siguientes(ExtendsOpcional) U Siguientes(Tipo)
+ListaMiembros = {  }  }
+ListaMiembrosInterfaz = {  }  }
+AsignacionOpcional = { ; }
+ListaArgsFormalesOpcional = { ) }
+ListaArgsFormales2 = { ) }
+ListaSentencias = {  }  }
+#DeclaracionMultiple = { 
+ExpresionOpcional = { ; }
+SentenciaElse = Siguientes(ListaSentencias) = {  {  }
+#OperadorTernarioOpcional =
+ExpresionCompuesta2 = Primeros(Expresion2) U Siguientes(ExpresionCompuesta)
+ExpresionCompuesta = Primeros(OperadorTernarioOpcional) U { ; } U Siguientes(VarLocalConVar) U Primeros(Expresion2)
+Referencia2 = Primeros(ExpresionCompuesta2) U Siguientes(ExpresionCompuesta)
+ArgsActualesOpcional = Siguientes(VarMetodoEncadenado) U Siguientes(AccesoVarLlamadaMetodo)
+ListaExpsOcional = { ) }
+ListaExps2 = { ) }
