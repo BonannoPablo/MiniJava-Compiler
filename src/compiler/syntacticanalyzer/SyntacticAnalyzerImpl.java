@@ -63,8 +63,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     public void start() throws LexicalException, SyntacticExceptions, SemanticException {
         symbolTable = new SymbolTable();
-
         retrieveNextToken();
+
         classAndInterfaceList();
         match(Token.TokenType.EOF);
         if (!exceptions.isEmpty()) {
@@ -364,23 +364,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-  /*  private void attributeOrMethod() throws LexicalException {
-        if (first(NonTerminal.TYPE).contains(currentToken.getTokenType())) {
-            type();
-            match(Token.TokenType.METVARID);
-            closingAttributeMethod();
-        } else if (first(NonTerminal.MODIFIER).contains(currentToken.getTokenType())) {
-            modifier();
-            methodType();
-            match(Token.TokenType.METVARID);
-            formalArgsAndOptionalBlock();
-        } else if (currentToken.getTokenType().equals(Token.TokenType.VOID_WORD)) {
-            retrieveNextToken();
-            match(Token.TokenType.METVARID);
-            formalArgsAndOptionalBlock();
-        }
-    }*/
-
     private void closingAttributeMethod(Type classId, Token metVarIdToken, Token visibility) throws LexicalException, SemanticException {
         if (first(NonTerminal.FORMAL_ARGS_AND_OPTIONAL_BLOCK).contains(currentToken.getTokenType())) {
             MethodEntry methodEntry = new MethodEntry(metVarIdToken);
@@ -388,7 +371,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentClass().setCurrentMethod(methodEntry);
             if(!formalArgsAndOptionalBlock())
-                throw new SemanticException("Method body expected", metVarIdToken);
+                throw new SemanticException("Method body expected", metVarIdToken);         //TODO check this}
             symbolTable.getCurrentClass().addMethod(methodEntry);
         } else {
             AttributeEntry attributeEntry = new AttributeEntry(metVarIdToken, classId);
@@ -769,14 +752,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 exceptions.add(new SyntacticException(currentToken, "an expression"));
                 recovery();
             }
-        }
-    }
-
-    private void optionalCompoundExpression() throws LexicalException {
-        if (first(NonTerminal.COMPOUND_EXPRESSION).contains(currentToken.getTokenType())) {
-            compoundExpression();
-        } else {
-            //Empty production
         }
     }
 

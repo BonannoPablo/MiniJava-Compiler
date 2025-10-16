@@ -9,8 +9,8 @@ Obs. el carácter  es la cadena vacía
 <Interfaz> ::= interface idClase <GenericidadOpcional> <ExtendsOpcional> { <ListaMiembrosInterfaz> }
 
 <Modificador> ::= abstract | static | final
+<ModificadorOpcional> ::= <Modificador> | 
 <VisibilidadOpcional> ::= public | private | 
-<PrivateOpcional> ::= private | 
 
 <HerenciaOpcional> ::= extends idClase <GenericidadOpcional>| implements idClase <GenericidadOpcional>| 
 <ExtendsOpcional> ::= extends idClase <GenericidadOpcional>| 
@@ -21,7 +21,6 @@ Obs. el carácter  es la cadena vacía
 <GenericidadOpcional> ::= <  idClase  > | 
 
 <ListaMiembros> ::= <VisibilidadOpcional> <AtributoOMetodo> <ListaMiembros> | 
-####<ListaMIembros> ::= public <Miembro> <ListaMiembros> 
 <ListaMiembrosInterfaz> ::= <VisibilidadOpcional> <MiembroInterfaz> <ListaMiembrosInterfaz> | 
 
 <Miembro> ::= <TipoPrimitivo> idMetVar <CierreAtributoMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> 
@@ -29,16 +28,14 @@ Obs. el carácter  es la cadena vacía
 <MiembroInterfaz> ::= <Tipo>  idMetVar <AtributoInicializadoOMetodo> | <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional>  
 <MiembroInterfaz> ::= void idMetVar <ArgsFormalesYBloqueOpcional>
 
+<ConstructorUOtroMiembro> ::= <ArgsFormales> <Bloque> | idMetVar <CierreAtributoMetodo>
+
 <CierreAtributoMetodo> ::= <AsignacionOpcional> ; | <ArgsFormalesYBloqueOpcional>
-<CierreAtributoMetodoInterfaz> ::=   = <ExpresionCompuesta> ; | <ArgsFormalesYBloqueOpcional>
+<CierreAtributoMetodoInterfaz> ::=   = <ExpresionCompuesta> <OperadorTernarioOpcional> ; | <ArgsFormalesYBloqueOpcional>
+
 <ArgsFormalesYBloqueOpcional> ::= <ArgsFormales> <BloqueOpcional>
 									
-<AsignacionOpcional> ::=   =   <ExpresionCompuesta> | 
-
-<AtributoOMetodo> ::= <Tipo> idMetVar <CierreAtributoMetodo> 
-<AtributoOMetodo> ::= <Modificador> <TipoMetodo> idMetVar <ArgsFormalesYBloqueOpcional> | void idMetVar <ArgsFormalesYBloqueOpcional>
-
-<ConstructorUOtroMiembro> ::= <ArgsFormales> <Bloque> | idMetVar <CierreAtributoMetodo>
+<AsignacionOpcional> ::=   =   <ExpresionCompuesta> <OperadorTernarioOpcional> | 
 
 <TipoMetodo> ::= <Tipo> | void
 
@@ -47,7 +44,6 @@ Obs. el carácter  es la cadena vacía
 <TipoPrimitivo> ::= boolean | char | int
 
 <ArgsFormales> ::= ( <ListaArgsFormalesOpcional> )
-
 
 <ListaArgsFormalesOpcional> ::= <ListaArgsFormales> | 
 
@@ -72,7 +68,7 @@ Obs. el carácter  es la cadena vacía
 
 <AsignacionLlamadaOVarLocal> ::= <VarLocalConVar>
 <AsignacionLlamadaOVarLocal> ::= <VarLocalConTipoPrimitivo> 
-<AsignacionLlamadaOVarLocal> ::= idClase <MetodoEstativoOVarLocal> 
+<AsignacionLlamadaOVarLocal> ::= idClase <MetodoEstaticoOVarLocal> 
 <AsignacionLlamadaOVarLocal> ::= <ExpresionSinLlamadaMetodoEstatico>
 
 <MetodoEstativoOVarLocal> ::=  . idMetVar <ArgsActuales> <Referencia2> <ExpresionCompuesta2> <Expresion2>

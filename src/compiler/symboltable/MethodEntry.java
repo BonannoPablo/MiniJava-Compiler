@@ -87,15 +87,18 @@ public class MethodEntry{
 
     public boolean matchSignatures(MethodEntry m) {
         Token[] genericTypeMap = symbolTable.getCurrentClass().getGenericTypeMap();
-        boolean match = returnType.getName().equals(m.getReturnType().getName()) ||
-                (genericTypeMap != null && returnType.getName().equals(genericTypeMap[0].getLexeme())               //TODO refactor this pls omg
+        boolean matchGenericTypes = (genericTypeMap != null && returnType.getName().equals(genericTypeMap[0].getLexeme())               //TODO refactor this
                 && m.getReturnType().getName().equals(genericTypeMap[1].getLexeme()) );
+        boolean match = returnType.getName().equals(m.getReturnType().getName()) || matchGenericTypes;
+                ;
         List<ParameterEntry> otherParameters = m.getParameters();
         if(parameters.size() == otherParameters.size()) {
-            for (int i = 0; i < parameters.size() && match; i++)
+            for (int i = 0; i < parameters.size() && match; i++) {
+                boolean matchParameterGenericTypes = genericTypeMap != null && parameters.get(i).getType().getName().equals(genericTypeMap[0].getLexeme())
+                        && otherParameters.get(i).getType().getName().equals(genericTypeMap[1].getLexeme());
                 match = parameters.get(i).getType().getName().equals(otherParameters.get(i).getType().getName())
-                        || (genericTypeMap != null && parameters.get(i).getType().getName().equals(genericTypeMap[0].getLexeme())
-                && otherParameters.get(i).getType().getName().equals(genericTypeMap[1].getLexeme()));
+                        || matchParameterGenericTypes;
+            }
             return match;
         }else{
             return false;
