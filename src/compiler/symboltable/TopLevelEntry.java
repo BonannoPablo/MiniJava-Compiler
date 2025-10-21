@@ -6,6 +6,7 @@ import compiler.token.Token;
 import java.util.Map;
 
 public abstract class TopLevelEntry {
+    protected String name;
     protected Token modifierToken;
     protected Token.TokenType modifier;
     protected Map<String, AttributeEntry> attributes;
@@ -19,6 +20,10 @@ public abstract class TopLevelEntry {
             this.modifier = null;
         else
             this.modifier = modifierToken.getTokenType();
+    }
+
+    public String getName(){
+        return name;
     }
 
     public abstract MethodEntry getCurrentMethod();

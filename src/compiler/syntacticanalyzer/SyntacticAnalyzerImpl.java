@@ -414,8 +414,9 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             closingAttributeMethod(type, metVarIdToken, visibility);
         } else if (first(NonTerminal.FORMAL_ARGS).contains(currentToken.getTokenType())) {
             MethodEntry constructor = new MethodEntry(classIdToken);
-            symbolTable.getCurrentClass().addConstructor(constructor);
+            symbolTable.getCurrentClass().setCurrentMethod(constructor);
             formalArgs();
+            symbolTable.getCurrentClass().addConstructor(constructor);
             block();
         } else {
             if(!panicMode){

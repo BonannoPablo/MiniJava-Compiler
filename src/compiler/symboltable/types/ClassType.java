@@ -13,4 +13,9 @@ public class ClassType extends Type{
     public String getGenericType() {
         return genericType.getLexeme();
     }
+
+    @Override
+    public Token getGenericTypeToken() {
+        return genericType;
+    }
 }

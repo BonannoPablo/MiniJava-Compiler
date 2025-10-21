@@ -1,6 +1,7 @@
 package compiler.symboltable;
 
 import compiler.exceptions.SemanticException;
+import compiler.symboltable.types.ClassType;
 import compiler.symboltable.types.Type;
 import compiler.token.Token;
 import compiler.token.TokenImpl;
@@ -50,12 +51,26 @@ public class MethodEntry{
 
 
     public void checkDeclaration() throws SemanticException {
-        Token genericType = symbolTable.getCurrentClass().getGenericType();
-        if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID
-            && ! (symbolTable.existsClass(returnType.getName()) || (genericType != null &&  returnType.getName().equals(genericType.getLexeme())))){
-            throw new SemanticException("Class does not exist", returnType.getToken());//TODO change msg
-        }
+        Token containerClassGenericTypeToken = symbolTable.getCurrentClass().getGenericType();
+        String containerClassGenericType = containerClassGenericTypeToken == null ? "" : containerClassGenericTypeToken.getLexeme();
+        boolean existsReturnTypeClass = symbolTable.existsClass(returnType.getName());
+        boolean returnTypeHasGenericType = !returnType.getGenericType().isEmpty();
+        boolean declaredClassHasGenericType = existsReturnTypeClass && symbolTable.getClassEntry(returnType.getName()).getGenericType() != null;
 
+
+
+        if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID
+            && ! (existsReturnTypeClass || returnType.getName().equals(containerClassGenericType))
+        )
+            throw new SemanticException("Class does not exist", returnType.getToken());//TODO change msg
+        else if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID &&
+                (declaredClassHasGenericType && !returnTypeHasGenericType)
+                || (!declaredClassHasGenericType && returnTypeHasGenericType)
+            )
+            throw new SemanticException("Class does not accept generic types", returnType.getToken());
+        else if(returnTypeHasGenericType &&
+              ! (symbolTable.existsClass(returnType.getGenericType()) || returnType.getGenericType().equals(containerClassGenericType)))
+            throw new SemanticException("Class does not exist", returnType.getGenericTypeToken());
         for(ParameterEntry parameter : parameters){
             parameter.checkDeclaration();
         }
