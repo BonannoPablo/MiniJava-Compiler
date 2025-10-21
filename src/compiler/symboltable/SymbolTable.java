@@ -75,6 +75,12 @@ public class SymbolTable {
         }
     }
 
+    public void printAST(){
+        for(var c: classTable.values()){
+            c.printAST();
+        }
+    }
+
     public void checkDeclarations() throws SemanticException {
         for(ClassEntry c: classTable.values()){
             currentClass = c;

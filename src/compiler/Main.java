@@ -54,7 +54,7 @@ public class Main {
         }
 
 
-        //symbolTable.print();
+        symbolTable.printAST();
 
     }
 

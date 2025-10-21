@@ -251,4 +251,11 @@ public class ClassEntry extends TopLevelEntry {
     public Token getGenericType() {
         return genericType;
     }
+
+    public void printAST(){
+        System.out.println("AST for class " + name + ":");
+        for(MethodEntry method : methods.values()){
+            method.printAST();
+        }
+    }
 }
