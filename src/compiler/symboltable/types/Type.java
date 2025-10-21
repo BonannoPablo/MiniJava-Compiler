@@ -18,4 +18,10 @@ public abstract class Type {
     public Token getToken() {
         return token;
     }
+
+    public String getGenericType(){
+        return "";
+    }
+
+    public abstract Token getGenericTypeToken() ;
 }

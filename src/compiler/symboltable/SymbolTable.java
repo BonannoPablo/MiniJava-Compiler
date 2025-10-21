@@ -90,6 +90,9 @@ public class SymbolTable {
     public ClassEntry getClassEntry(Token parent) {
         return classTable.get(parent.getLexeme());
     }
+    public ClassEntry getClassEntry(String name) {
+        return classTable.get(name);
+    }
 
     public InterfaceEntry getInterface(Token parent) {
         return interfaceTable.get(parent.getLexeme());
@@ -114,5 +117,12 @@ public class SymbolTable {
 
     public void setCurrentClass(ClassEntry classEntry) {
         currentClass = classEntry;
+    }
+
+    public TopLevelEntry getTopLevelEntry(String name) {
+        return classTable.containsKey(name) ? classTable.get(name) : interfaceTable.get(name);
+    }
+    public boolean existsTopLevelEntry(String name) {
+        return classTable.containsKey(name) || interfaceTable.containsKey(name);
     }
 }

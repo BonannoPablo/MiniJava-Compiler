@@ -10,7 +10,6 @@ import static compiler.token.Token.TokenType.FINAL_WORD;
 import static compiler.token.Token.TokenType.STATIC_WORD;
 
 public class InterfaceEntry extends TopLevelEntry {
-    private String name;
     private Token token;
     private Token genericType;
     private Token parent;
@@ -20,10 +19,6 @@ public class InterfaceEntry extends TopLevelEntry {
         name = token.getLexeme();
         methods = new HashMap<>();
         attributes = new HashMap<>();
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void addGenericType(Token token) {

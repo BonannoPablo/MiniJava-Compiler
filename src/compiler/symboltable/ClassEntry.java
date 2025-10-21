@@ -11,7 +11,6 @@ import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 import static compiler.token.Token.TokenType.*;
 
 public class ClassEntry extends TopLevelEntry {
-    private String name;
     private Token token;
     private Token implementedInterface;
     private Token parent;
@@ -29,10 +28,6 @@ public class ClassEntry extends TopLevelEntry {
         parent = new TokenImpl(Token.TokenType.CLASSID, "Object", -1);
         parentGenericType = null;
         genericTypeMap = null;
-    }
-
-    public String getName(){
-        return name;
     }
 
     public void setImplementedInterface(Token implementedInterface){
@@ -93,6 +88,9 @@ public class ClassEntry extends TopLevelEntry {
     private void checkImplementedMethods() throws SemanticException {
         if(implementedInterface != null && modifier != ABSTRACT_WORD){
             InterfaceEntry interfaceObject = symbolTable.getInterface(implementedInterface);
+            if(interfaceObject == null)
+                throw new SemanticException("Interface not found", implementedInterface);
+            interfaceObject.consolidate();
             for(MethodEntry method : interfaceObject.getMethods()){
                 String methodToImplementName = method.getParameters().size() + method.getName();
                 if(methods.containsKey(methodToImplementName)){
