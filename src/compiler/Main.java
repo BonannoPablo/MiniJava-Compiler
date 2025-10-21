@@ -5,6 +5,7 @@ import compiler.lexicalanalyzer.LexicalAnalyzer;
 import compiler.lexicalanalyzer.LexicalAnalyzerImpl;
 import compiler.syntacticanalyzer.SyntacticAnalyzer;
 import compiler.syntacticanalyzer.SyntacticAnalyzerImpl;
+import compiler.syntacticanalyzer.SyntacticAnalyzerWOSemantics;
 import compiler.token.Token;
 import sourcemanager.EfficientSourceManager;
 import sourcemanager.SourceManager;
