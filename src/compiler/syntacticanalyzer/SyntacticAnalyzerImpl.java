@@ -697,7 +697,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         if (first(NonTerminal.EXPRESSION).contains(currentToken.getTokenType())) {
             expression();
         }
-        return null; //TODO
+        return new MockExpressionNode(); //TODO
     }
 
     private IfNode ifSentence() throws LexicalException {
@@ -734,7 +734,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private ExpressionNode expression() throws LexicalException {
         compoundExpression();
         expression2();
-        return null; //TODO
+        return new MockExpressionNode(); //TODO
     }
 
     private void expression2() throws LexicalException {
