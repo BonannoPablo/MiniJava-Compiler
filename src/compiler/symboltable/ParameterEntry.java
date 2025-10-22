@@ -18,13 +18,22 @@ public class ParameterEntry {
     }
 
     public void checkDeclaration() throws SemanticException {
-        Token genericType = symbolTable.getCurrentClass().getGenericType();
-        boolean genericTypeMatch = genericType != null && type.getToken().getLexeme().equals(genericType.getLexeme());
+        Token containerClassGenericType = symbolTable.getCurrentClass().getGenericType();
+        boolean genericTypeMatch = containerClassGenericType != null && type.getToken().getLexeme().equals(containerClassGenericType.getLexeme());
+        boolean existsTypeClass = symbolTable.existsClass(type.getName());
+
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID
-        && ! (symbolTable.existsClass(type.getName()) || genericTypeMatch))
+        && ! (existsTypeClass || genericTypeMatch))
                 throw new SemanticException("Class does not exist", type.getToken()); //TODO change msg
 
-        //TODO check generic type if parameters???
+        boolean declaredClassHasGenericType = existsTypeClass && symbolTable.getClassEntry(type.getName()).getGenericType() != null;
+
+        if(!type.getGenericType().isEmpty() &&
+           ! (symbolTable.existsClass(type.getGenericType()) || (containerClassGenericType != null && type.getGenericType().equals(containerClassGenericType.getLexeme()))))
+            throw new SemanticException("Class does not exist", type.getGenericTypeToken());
+
+
+
     }
 
     public Type getType() {

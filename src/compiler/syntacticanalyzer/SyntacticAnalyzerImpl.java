@@ -1,5 +1,6 @@
 package compiler.syntacticanalyzer;
 
+import compiler.ast.*;
 import compiler.exceptions.LexicalException;
 import compiler.exceptions.SemanticException;
 import compiler.exceptions.SyntacticException;
@@ -14,6 +15,7 @@ import compiler.token.TokenImpl;
 import utils.CustomHashSet;
 import utils.CustomSet;
 
+import java.beans.Expression;
 import java.util.*;
 
 public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
@@ -270,11 +272,12 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentClass().setCurrentMethod(methodEntry);
             boolean modifierIsAbstract = (modifier != null && modifier.getTokenType() == Token.TokenType.ABSTRACT_WORD);
-            boolean hasBody = formalArgsAndOptionalBlock();
-            if(modifierIsAbstract && hasBody)
+            var block = formalArgsAndOptionalBlock();
+            if(modifierIsAbstract && block != null)
                 throw new SemanticException("Abstract method can't have a body", metVarId);
-            if(!modifierIsAbstract && !hasBody)
+            if(!modifierIsAbstract && block == null)
                 throw new SemanticException("Method body expected", metVarId);
+            methodEntry.addBlock(block);
             symbolTable.getCurrentClass().addMethod(methodEntry);
         } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
             var classIdToken = currentToken;
@@ -289,8 +292,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(new PrimitiveType(voidWord));
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentClass().setCurrentMethod(methodEntry);
-            if(!formalArgsAndOptionalBlock())
+            var block = formalArgsAndOptionalBlock();
+            if(block == null)
                 throw new SemanticException("Method body expected", metVarIdToken);
+            methodEntry.addBlock(block);
             symbolTable.getCurrentClass().addMethod(methodEntry);
         } else {
             if (!panicMode) {
@@ -318,11 +323,12 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setModifier(modifier);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
             boolean modifierIsStatic = (modifier != null && modifier.getTokenType() == Token.TokenType.STATIC_WORD);
-            boolean hasBody = formalArgsAndOptionalBlock();
-            if(hasBody && !modifierIsStatic)
+            var block = formalArgsAndOptionalBlock();
+            if(block != null && !modifierIsStatic)
                 throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
-            if(!hasBody && modifierIsStatic)
+            if(block == null && modifierIsStatic)
                 throw new SemanticException("Interface static methods must have body", metVarIdToken);
+            methodEntry.addBlock(block);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else if (currentToken.getTokenType().equals(Token.TokenType.VOID_WORD)) {
             Token voidWord = currentToken;
@@ -334,8 +340,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(new PrimitiveType(voidWord));
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
-            if(formalArgsAndOptionalBlock())
+            var block = formalArgsAndOptionalBlock();
+            if(block != null)
                 throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
+
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else {
             if (!panicMode) {
@@ -371,8 +379,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(classId);
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentClass().setCurrentMethod(methodEntry);
-            if(!formalArgsAndOptionalBlock())
+            var block = formalArgsAndOptionalBlock();
+            if(block == null)
                 throw new SemanticException("Method body expected", metVarIdToken);         //TODO check this}
+            methodEntry.addBlock(block);
             symbolTable.getCurrentClass().addMethod(methodEntry);
         } else {
             AttributeEntry attributeEntry = new AttributeEntry(metVarIdToken, classId);
@@ -398,7 +408,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodEntry.setReturnType(type);
             methodEntry.setVisibility(visibility);
             symbolTable.getCurrentInterface().setCurrentMethod(methodEntry);
-            if(formalArgsAndOptionalBlock())
+            var block = formalArgsAndOptionalBlock();
+            if(block == null)
                 throw new SemanticException("Interface abstract methods cannot have body", metVarIdToken);
             symbolTable.getCurrentInterface().addMethod(methodEntry);
         } else {
@@ -409,7 +420,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private boolean formalArgsAndOptionalBlock() throws LexicalException, SemanticException {
+    private BlockNode formalArgsAndOptionalBlock() throws LexicalException, SemanticException {
         formalArgs();
         return optionalBlock();
     }
@@ -513,59 +524,64 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return new ParameterEntry(t, metVarIdToken);
     }
 
-    private boolean optionalBlock() throws LexicalException {
+    private BlockNode optionalBlock() throws LexicalException {
         if (first(NonTerminal.BLOCK).contains(currentToken.getTokenType())) {
-            block();
-            return true;
+            return block();
         } else {
             match(Token.TokenType.SEMICOLON);
-            return false;
+            return null;
         }
     }
 
-    private void block() throws LexicalException {
+    private BlockNode block() throws LexicalException {
+        BlockNode block = new BlockNode();
+
         match(Token.TokenType.OPENING_BRACE);
-        sentenceList();
+        sentenceList(block);
         match(Token.TokenType.CLOSING_BRACE);
+        return block;
     }
 
-    private void sentenceList() throws LexicalException {
+    private void sentenceList(BlockNode block) throws LexicalException {
         if (first(NonTerminal.SENTENCE).contains(currentToken.getTokenType())) {
-            sentence();
-            sentenceList();
+            block.addSentence(sentence());
+            sentenceList(block);
         }
     }
 
-    private void sentence() throws LexicalException {
+    private SentenceNode sentence() throws LexicalException {
       /*  if (currentToken.getTokenType().equals(Token.TokenType.FOR_WORD)) {
             forSentence();
         } else */if (first(NonTerminal.BLOCK).contains(currentToken.getTokenType())) {
-            block();
+            return block();
         } else if (currentToken.getTokenType().equals(Token.TokenType.WHILE_WORD)) {
-            whileSentence();
+            return whileSentence();
         } else if (currentToken.getTokenType().equals(Token.TokenType.IF_WORD)) {
-            ifSentence();
+            return ifSentence();
         } else if (currentToken.getTokenType().equals(Token.TokenType.RETURN_WORD)) {
-            returnSentence();
+            var returnNode = returnSentence();
             match(Token.TokenType.SEMICOLON);
+            return returnNode;
         } else if (first(NonTerminal.ASSIGNMENT_CALL_OR_LOCALVAR).contains(currentToken.getTokenType())) {
             assignmentCallOrLocalVar();
             match(Token.TokenType.SEMICOLON);
         } else {
             match(Token.TokenType.SEMICOLON);
         }
+        return null;
     }
 
     private void assignmentCallOrLocalVar() throws LexicalException {
         if (first(NonTerminal.LOCAL_VAR_WITH_VAR).contains(currentToken.getTokenType())) {
             localVarWithVar();
         } else if (first(NonTerminal.LOCAL_VAR_WITH_PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
-            localVarWithPrimitiveType();
+            localVarWithPrimitiveType(); //TODO implement classic variable declaration in AST
         } else if (first(NonTerminal.EXPRESSION_WO_STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
             expressionWOStaticMethodCall();
         } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
-            retrieveNextToken();
-            staticMethodOrLocalVar();
+            var classIdToken = currentToken;
+            match(Token.TokenType.CLASSID);
+            staticMethodOrLocalVar(classIdToken); //TODO
         } else {
             if (!panicMode) {
                 exceptions.add(new SyntacticException(currentToken, "an assignment, call or local variable declaration"));
@@ -574,17 +590,20 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void staticMethodOrLocalVar() throws LexicalException {
+    private SentenceNode staticMethodOrLocalVar(Token classIdtoken) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.PERIOD)) {
-            retrieveNextToken();
+            var staticMethodCall = new StaticCallNode(classIdtoken);
+            match(Token.TokenType.PERIOD);
+            var methodToken = currentToken;
             match(Token.TokenType.METVARID);
-            actualArgs();
-            reference2();
+            staticMethodCall.addMethodCalled(methodToken);
+            staticMethodCall.addArguments(actualArgs());
+            reference2();     //TODO finish this. Add chained calls to static method call
             compoundExpression2();
             expression2();
-        } else {
+        } else { //TODO implement classic variable declaration in AST
             optionalGenerics();
-            match(Token.TokenType.METVARID);               //Maybe I want to check if the token is metvarid here and throw exception if it's not
+            match(Token.TokenType.METVARID);
             multipleDeclaration();
             optionalAssignment();
         }
@@ -601,10 +620,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private void localVarWithVar() throws LexicalException {
+        var varInitNode = new VarInitNode();
         match(Token.TokenType.VAR_WORD);
+        Token token = currentToken;
         match((Token.TokenType.METVARID));
+        varInitNode.addToken(token);
         match(Token.TokenType.EQUAL);
-        compoundExpression();
+        varInitNode.addExpression(compoundExpression());
         optionalTernaryOperator();
     }
 
@@ -615,53 +637,53 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         optionalAssignment();
     }
 
- /*   private void forSentence() throws LexicalException {
-        match(Token.TokenType.FOR_WORD);
-        match(Token.TokenType.OPENING_PAREN);
-        forSentence2();
-        forCondition();
-        match(Token.TokenType.CLOSING_PAREN);
-        sentence();
-    }
+    /*   private void forSentence() throws LexicalException {
+           match(Token.TokenType.FOR_WORD);
+           match(Token.TokenType.OPENING_PAREN);
+           forSentence2();
+           forCondition();
+           match(Token.TokenType.CLOSING_PAREN);
+           sentence();
+       }
 
-    private void forSentence2() throws LexicalException {
-        if (first(NonTerminal.LOCAL_VAR_WITH_VAR).contains(currentToken.getTokenType())) {
-            localVarWithVar();
-        } else if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
-            primitiveType();
-            match(Token.TokenType.METVARID);
-            multipleDeclaration();
-            optionalAssignment();
-        } else if (first(NonTerminal.EXPRESSION_WO_STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
-            expressionWOStaticMethodCall();
-        } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
-            match(Token.TokenType.CLASSID);
-            staticMethodOrLocalVar();
-        } else {
-            //Empty production
-        }
-    }
+       private void forSentence2() throws LexicalException {
+           if (first(NonTerminal.LOCAL_VAR_WITH_VAR).contains(currentToken.getTokenType())) {
+               localVarWithVar();
+           } else if (first(NonTerminal.PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
+               primitiveType();
+               match(Token.TokenType.METVARID);
+               multipleDeclaration();
+               optionalAssignment();
+           } else if (first(NonTerminal.EXPRESSION_WO_STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
+               expressionWOStaticMethodCall();
+           } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
+               match(Token.TokenType.CLASSID);
+               staticMethodOrLocalVar();
+           } else {
+               //Empty production
+           }
+       }
 
-    private void forCondition() throws LexicalException {
-        switch (currentToken.getTokenType()) {
-            case Token.TokenType.SEMICOLON:
-                match(Token.TokenType.SEMICOLON);
-                optionalCompoundExpression();
-                match(Token.TokenType.SEMICOLON);
-                optionalExpression();
-                break;
-            case Token.TokenType.COLON:
-                retrieveNextToken();
-                expression();
-                break;
-            default:
-                if (!panicMode) {
-                    exceptions.add(new SyntacticException(currentToken, ": or ;"));
-                    recovery();
-                }
-        }
-    }
-*/
+       private void forCondition() throws LexicalException {
+           switch (currentToken.getTokenType()) {
+               case Token.TokenType.SEMICOLON:
+                   match(Token.TokenType.SEMICOLON);
+                   optionalCompoundExpression();
+                   match(Token.TokenType.SEMICOLON);
+                   optionalExpression();
+                   break;
+               case Token.TokenType.COLON:
+                   retrieveNextToken();
+                   expression();
+                   break;
+               default:
+                   if (!panicMode) {
+                       exceptions.add(new SyntacticException(currentToken, ": or ;"));
+                       recovery();
+                   }
+           }
+       }
+   */
     private void multipleDeclaration() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             retrieveNextToken();
@@ -672,55 +694,64 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void returnSentence() throws LexicalException {
+    private ReturnNode returnSentence() throws LexicalException {
+        var node = new ReturnNode();
         match(Token.TokenType.RETURN_WORD);
-        optionalExpression();
+        node.addReturnExpression(optionalExpression());
+        return node;
     }
 
-    private void optionalExpression() throws LexicalException {
+    private ExpressionNode optionalExpression() throws LexicalException {
         if (first(NonTerminal.EXPRESSION).contains(currentToken.getTokenType())) {
             expression();
         }
+        return new MockExpressionNode(); //TODO
     }
 
-    private void ifSentence() throws LexicalException {
+    private IfNode ifSentence() throws LexicalException {
+        IfNode node = new IfNode();
         match(Token.TokenType.IF_WORD);
         match(Token.TokenType.OPENING_PAREN);
-        expression();
+        node.addCondition(expression());
         match(Token.TokenType.CLOSING_PAREN);
-        sentence();
-        elseSentence();
+        node.addThenSentence(sentence());
+        node.addElseSentence(elseSentence());
+        return node;
     }
 
-    private void elseSentence() throws LexicalException {
+    private SentenceNode elseSentence() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.ELSE_WORD)) {
             retrieveNextToken();
-            sentence();
+            return sentence();
         } else {
             //Empty production
         }
+        return null;
     }
 
-    private void whileSentence() throws LexicalException {
+    private WhileNode whileSentence() throws LexicalException {
+        var node = new WhileNode();
         match(Token.TokenType.WHILE_WORD);
         match(Token.TokenType.OPENING_PAREN);
-        expression();
+        node.addCondition(expression());
         match(Token.TokenType.CLOSING_PAREN);
-        sentence();
+        node.addSentence(sentence());
+        return node;
     }
 
-    private void expression() throws LexicalException {
+    private ExpressionNode expression() throws LexicalException {
         compoundExpression();
         expression2();
+        optionalTernaryOperator();
+        return new MockExpressionNode(); //TODO
     }
 
     private void expression2() throws LexicalException {
         if (first(NonTerminal.ASSIGNMENT_OPERATOR).contains(currentToken.getTokenType())) {
             assignmentOperator();
             compoundExpression();
-            optionalTernaryOperator();
         } else {
-            optionalTernaryOperator();
+            //Empty production
         }
     }
 
@@ -740,7 +771,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         match(Token.TokenType.EQUAL);
     }
 
-    private void compoundExpression() throws LexicalException {
+    private ExpressionNode compoundExpression() throws LexicalException {
         if (first(NonTerminal.BASIC_EXPRESSION).contains(currentToken.getTokenType())) {
             basicExpression();
             compoundExpression2();
@@ -754,6 +785,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 recovery();
             }
         }
+        return new MockExpressionNode(); //TODO
     }
 
     private void compoundExpression2() throws LexicalException {
@@ -911,31 +943,36 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         actualArgs();
     }
 
-    private void actualArgs() throws LexicalException {
+    private List<ExpressionNode> actualArgs() throws LexicalException {
         match(Token.TokenType.OPENING_PAREN);
-        optionalExpressionList();
+        var expressionList = optionalExpressionList();
         match(Token.TokenType.CLOSING_PAREN);
+        return expressionList;
     }
 
-    private void optionalExpressionList() throws LexicalException {
+    private List<ExpressionNode> optionalExpressionList() throws LexicalException {
         if (first(NonTerminal.EXPRESSION_LIST).contains(currentToken.getTokenType())) {
-            expressionList();
+            return expressionList();
         } else {
+            return new ArrayList<>();
             //Empty production
         }
     }
 
-    private void expressionList() throws LexicalException {
-        expression();
-        expressionList2();
+    private List<ExpressionNode> expressionList() throws LexicalException {
+        var expressionList = new LinkedList<ExpressionNode>();
+        expressionList.addLast(expression());
+        expressionList2(expressionList);
+        return expressionList;
     }
 
-    private void expressionList2() throws LexicalException {
+    private List<ExpressionNode> expressionList2(List<ExpressionNode> expressionList) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             retrieveNextToken();
-            expression();
-            expressionList2();
+            expressionList.addLast(expression());
+            expressionList2(expressionList);
         } else {
+            return expressionList;
             //Empty produciton
         }
     }

@@ -2,7 +2,7 @@ Siguientes
 
 ListaClasesEInterfaces = {eof}
 ModificadorOpcional = Primeros(ListaClasesEInterfaces2) = {class, interface}
-VisibilidadOpcional = Primeros(Miembro) U Primeros(MiembroInterfaz)
+VisibilidadOpcional = Primeros(Miembro) U Primeros(MiembroInterfaz) = {int, boolean, char, abstract, static, final, void, idClase}
 HerenciaOpcional = { { }
 ExtendsOpcional = {  {  }
 GenericidadODiamanteOpcional = Primeros(ArgsActuales) = { ( }
@@ -16,9 +16,27 @@ ListaArgsFormales2 = { ) }
 ListaSentencias = {  }  }
 #DeclaracionMultiple = { 
 ExpresionOpcional = { ; }
-SentenciaElse = Siguientes(ListaSentencias) = {  {  }
+SentenciaElse = Siguientes(ListaSentencias) = {  } , else }  <--- el control sobre else es inecesario pq else esta en primeros de sentenciaElse
 #OperadorTernarioOpcional =
-ExpresionCompuesta2 = Primeros(Expresion2) U Siguientes(ExpresionCompuesta)
+
+ExpresionCompuesta2 = P(Expresion2) U S(ExpresionCompuesteaSinLlamadaMetodoEstatico) U S(ExpresionCompuesta)
+					= { = , ? }  U  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ExpresionCompuesta2 = Primeros(Expresion2) U Siguientes(ExpresionCompuesta) = { = , ? , ; ,  }
 ExpresionCompuesta = Primeros(OperadorTernarioOpcional) U { ; } U Siguientes(VarLocalConVar) U Primeros(Expresion2)
 Referencia2 = Primeros(ExpresionCompuesta2) U Siguientes(ExpresionCompuesta)
 ArgsActualesOpcional = Siguientes(VarMetodoEncadenado) U Siguientes(AccesoVarLlamadaMetodo)

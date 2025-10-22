@@ -1,5 +1,6 @@
 package compiler.symboltable;
 
+import compiler.ast.BlockNode;
 import compiler.exceptions.SemanticException;
 import compiler.symboltable.types.ClassType;
 import compiler.symboltable.types.Type;
@@ -18,6 +19,7 @@ public class MethodEntry{
     Token visibility;
     List<ParameterEntry> parameters;
     Set<String> parametersNames;
+    BlockNode block;
 
 
     public MethodEntry(Token token){
@@ -136,5 +138,17 @@ public class MethodEntry{
         if(!parametersNames.add(parameterEntry.getName()))
             throw new SemanticException("Duplicate parameter name", parameterEntry.getToken());
         parameters.addLast(parameterEntry);
+    }
+
+    public void addBlock(BlockNode block) {
+        this.block = block;
+    }
+
+    public void printAST() {
+        System.out.println("Method: " + name);
+        if(block != null)
+            block.print(0);
+        else
+            System.out.println("No block");
     }
 }
