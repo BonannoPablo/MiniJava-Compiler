@@ -1,9 +1,12 @@
 package compiler.ast;
 
-public class ExpressionNode {
+import compiler.symboltable.types.Type;
+
+public abstract class ExpressionNode {
     public void print(int i) {
 
     }
 
-    public Type type
+
+    public abstract Type getType();
 }

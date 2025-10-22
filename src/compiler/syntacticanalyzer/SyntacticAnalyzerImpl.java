@@ -15,6 +15,7 @@ import compiler.token.TokenImpl;
 import utils.CustomHashSet;
 import utils.CustomSet;
 
+import java.beans.Expression;
 import java.util.*;
 
 public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
@@ -574,12 +575,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         if (first(NonTerminal.LOCAL_VAR_WITH_VAR).contains(currentToken.getTokenType())) {
             localVarWithVar();
         } else if (first(NonTerminal.LOCAL_VAR_WITH_PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
-            localVarWithPrimitiveType();
+            localVarWithPrimitiveType(); //TODO implement classic variable declaration in AST
         } else if (first(NonTerminal.EXPRESSION_WO_STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
             expressionWOStaticMethodCall();
         } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
-            retrieveNextToken();
-            staticMethodOrLocalVar();
+            var classIdToken = currentToken;
+            match(Token.TokenType.CLASSID);
+            staticMethodOrLocalVar(classIdToken); //TODO
         } else {
             if (!panicMode) {
                 exceptions.add(new SyntacticException(currentToken, "an assignment, call or local variable declaration"));
@@ -588,17 +590,20 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void staticMethodOrLocalVar() throws LexicalException {
+    private SentenceNode staticMethodOrLocalVar(Token classIdtoken) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.PERIOD)) {
-            retrieveNextToken();
+            var staticMethodCall = new StaticCallNode(classIdtoken);
+            match(Token.TokenType.PERIOD);
+            var methodToken = currentToken;
             match(Token.TokenType.METVARID);
-            actualArgs();
-            reference2();
+            staticMethodCall.addMethodCalled(methodToken);
+            staticMethodCall.addArguments(actualArgs());
+            reference2();     //TODO finish this. Add chained calls to static method call
             compoundExpression2();
             expression2();
-        } else {
+        } else { //TODO implement classic variable declaration in AST
             optionalGenerics();
-            match(Token.TokenType.METVARID);               //Maybe I want to check if the token is metvarid here and throw exception if it's not
+            match(Token.TokenType.METVARID);
             multipleDeclaration();
             optionalAssignment();
         }
@@ -615,10 +620,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private void localVarWithVar() throws LexicalException {
+        var varInitNode = new VarInitNode();
         match(Token.TokenType.VAR_WORD);
+        Token token = currentToken;
         match((Token.TokenType.METVARID));
+        varInitNode.addToken(token);
         match(Token.TokenType.EQUAL);
-        compoundExpression();
+        varInitNode.addExpression(compoundExpression());
         optionalTernaryOperator();
     }
 
@@ -734,6 +742,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private ExpressionNode expression() throws LexicalException {
         compoundExpression();
         expression2();
+        optionalTernaryOperator();
         return new MockExpressionNode(); //TODO
     }
 
@@ -741,9 +750,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         if (first(NonTerminal.ASSIGNMENT_OPERATOR).contains(currentToken.getTokenType())) {
             assignmentOperator();
             compoundExpression();
-            optionalTernaryOperator();
         } else {
-            optionalTernaryOperator();
+            //Empty production
         }
     }
 
@@ -763,7 +771,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         match(Token.TokenType.EQUAL);
     }
 
-    private void compoundExpression() throws LexicalException {
+    private ExpressionNode compoundExpression() throws LexicalException {
         if (first(NonTerminal.BASIC_EXPRESSION).contains(currentToken.getTokenType())) {
             basicExpression();
             compoundExpression2();
@@ -777,6 +785,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 recovery();
             }
         }
+        return new MockExpressionNode(); //TODO
     }
 
     private void compoundExpression2() throws LexicalException {
@@ -934,31 +943,36 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         actualArgs();
     }
 
-    private void actualArgs() throws LexicalException {
+    private List<ExpressionNode> actualArgs() throws LexicalException {
         match(Token.TokenType.OPENING_PAREN);
-        optionalExpressionList();
+        var expressionList = optionalExpressionList();
         match(Token.TokenType.CLOSING_PAREN);
+        return expressionList;
     }
 
-    private void optionalExpressionList() throws LexicalException {
+    private List<ExpressionNode> optionalExpressionList() throws LexicalException {
         if (first(NonTerminal.EXPRESSION_LIST).contains(currentToken.getTokenType())) {
-            expressionList();
+            return expressionList();
         } else {
+            return new ArrayList<>();
             //Empty production
         }
     }
 
-    private void expressionList() throws LexicalException {
-        expression();
-        expressionList2();
+    private List<ExpressionNode> expressionList() throws LexicalException {
+        var expressionList = new LinkedList<ExpressionNode>();
+        expressionList.addLast(expression());
+        expressionList2(expressionList);
+        return expressionList;
     }
 
-    private void expressionList2() throws LexicalException {
+    private List<ExpressionNode> expressionList2(List<ExpressionNode> expressionList) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             retrieveNextToken();
-            expression();
-            expressionList2();
+            expressionList.addLast(expression());
+            expressionList2(expressionList);
         } else {
+            return expressionList;
             //Empty produciton
         }
     }
