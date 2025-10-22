@@ -23,6 +23,8 @@ public class ParameterEntry {
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID
         && ! (symbolTable.existsClass(type.getName()) || genericTypeMatch))
                 throw new SemanticException("Class does not exist", type.getToken()); //TODO change msg
+
+        //TODO check generic type if parameters???
     }
 
     public Type getType() {
