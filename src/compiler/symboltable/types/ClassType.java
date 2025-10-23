@@ -11,7 +11,7 @@ public class ClassType extends Type{
     }
 
     public String getGenericType() {
-        return genericType.getLexeme();
+        return genericType != null ? genericType.getLexeme() : "";
     }
 
     @Override

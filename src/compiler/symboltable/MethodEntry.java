@@ -65,19 +65,28 @@ public class MethodEntry{
             && ! (existsReturnTypeClass || returnType.getName().equals(containerClassGenericType))
         )
             throw new SemanticException("Class does not exist", returnType.getToken());//TODO change msg
+
         else if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID &&
-                (declaredClassHasGenericType && !returnTypeHasGenericType)
-                || (!declaredClassHasGenericType && returnTypeHasGenericType)
-            )
+                (!declaredClassHasGenericType && returnTypeHasGenericType)
+        )
             throw new SemanticException("Class does not accept generic types", returnType.getToken());
+
+        else if(returnType.getToken().getTokenType() == Token.TokenType.CLASSID
+                && (declaredClassHasGenericType && !returnTypeHasGenericType)
+        )
+            throw new SemanticException("Class requires generic type", returnType.getToken()); //TODO ask if raw type is allowed
+
         else if(returnTypeHasGenericType &&
-              ! (symbolTable.existsClass(returnType.getGenericType()) || returnType.getGenericType().equals(containerClassGenericType)))
+              ! (symbolTable.existsClass(returnType.getGenericType()) || returnType.getGenericType().equals(containerClassGenericType))
+        )
             throw new SemanticException("Class does not exist", returnType.getGenericTypeToken());
+
         for(ParameterEntry parameter : parameters){
             parameter.checkDeclaration();
         }
 
     }
+
     public void checkConstructionDeclaration() throws SemanticException {
         if(!name.equals(symbolTable.getCurrentClass().getName()))
             throw new SemanticException("Constructor should be named after class name", token);

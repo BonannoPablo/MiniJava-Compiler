@@ -607,6 +607,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             multipleDeclaration();
             optionalAssignment();
         }
+        return null;
     }
 
     private void expressionWOStaticMethodCall() throws LexicalException {
@@ -970,7 +971,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             retrieveNextToken();
             expressionList.addLast(expression());
-            expressionList2(expressionList);
+            return expressionList2(expressionList);
         } else {
             return expressionList;
             //Empty produciton
