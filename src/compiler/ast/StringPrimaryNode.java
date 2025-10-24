@@ -2,7 +2,7 @@ package compiler.ast;
 
 import compiler.symboltable.types.Type;
 
-public class IntLiteral extends Primitive{
+public class StringPrimaryNode extends Primary{
     @Override
     public void print(int i) {
 
