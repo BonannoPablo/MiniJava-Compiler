@@ -22,12 +22,18 @@ public class IfNode extends SentenceNode {
     }
     public void print(int level){
         System.out.println(" ".repeat(level)+"IF");
-        if(condition != null) //TODO throw exception if there is no condition
-            condition.print(level+1);
-        if(thenSentence != null) //TODO throw exception if there is no then sentence
-            thenSentence.print(level+1);
-        if(elseSentence != null)
-            elseSentence.print(level+1);
+        if(condition != null) { //TODO throw exception if there is no condition
+            System.out.println(" ".repeat(level)+"condition");
+            condition.print(level + 1);
+        }
+        if(thenSentence != null) {//TODO throw exception if there is no then sentence
+            System.out.println(" ".repeat(level)+"then sentence");
+            thenSentence.print(level + 1);
+        }
+        if(elseSentence != null) {
+            System.out.println(" ".repeat(level)+"else sentence");
+            elseSentence.print(level + 1);
+        }
     }
 
 }

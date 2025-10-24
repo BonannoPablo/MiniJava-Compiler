@@ -7,6 +7,11 @@ import compiler.token.TokenImpl;
 
 public class MockExpressionNode extends ExpressionNode{
     @Override
+    public void print(int i) {
+        System.out.println(" ".repeat(i)+"MOCK EXPRESSION");
+    }
+
+    @Override
     public Type getType() {
         return new UniversalType();
     }

@@ -15,7 +15,6 @@ import compiler.token.TokenImpl;
 import utils.CustomHashSet;
 import utils.CustomSet;
 
-import java.beans.Expression;
 import java.util.*;
 
 public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
@@ -396,8 +395,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private void closingAttributeMethodInterface(Token metVarIdToken, Type type, Token visibility) throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.EQUAL)) {
             match(Token.TokenType.EQUAL);
-            compoundExpression();
-            optionalTernaryOperator();
+            var exp = compoundExpression();
+            optionalTernaryOperator(exp);
             match(Token.TokenType.SEMICOLON);
 
             AttributeEntry attributeEntry = new AttributeEntry(metVarIdToken, type);
@@ -428,8 +427,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private void optionalAssignment() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.EQUAL)) {
             retrieveNextToken();
-            compoundExpression();
-            optionalTernaryOperator();
+            var exp = compoundExpression();
+            optionalTernaryOperator(exp);
         } else {
             //Empty production
         }
@@ -563,44 +562,59 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             match(Token.TokenType.SEMICOLON);
             return returnNode;
         } else if (first(NonTerminal.ASSIGNMENT_CALL_OR_LOCALVAR).contains(currentToken.getTokenType())) {
-            assignmentCallOrLocalVar();
+            var node = assignmentCallOrLocalVar();
             match(Token.TokenType.SEMICOLON);
+            return node;
         } else {
             match(Token.TokenType.SEMICOLON);
         }
         return null;
     }
 
-    private void assignmentCallOrLocalVar() throws LexicalException {
+    private SentenceNode assignmentCallOrLocalVar() throws LexicalException {
         if (first(NonTerminal.LOCAL_VAR_WITH_VAR).contains(currentToken.getTokenType())) {
-            localVarWithVar();
+            return localVarWithVar();
         } else if (first(NonTerminal.LOCAL_VAR_WITH_PRIMITIVE_TYPE).contains(currentToken.getTokenType())) {
             localVarWithPrimitiveType(); //TODO implement classic variable declaration in AST
         } else if (first(NonTerminal.EXPRESSION_WO_STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
-            expressionWOStaticMethodCall();
+            return expressionWOStaticMethodCall();
         } else if (currentToken.getTokenType().equals(Token.TokenType.CLASSID)) {
             var classIdToken = currentToken;
             match(Token.TokenType.CLASSID);
-            staticMethodOrLocalVar(classIdToken); //TODO
+            return staticMethodOrLocalVar(classIdToken);
         } else {
             if (!panicMode) {
                 exceptions.add(new SyntacticException(currentToken, "an assignment, call or local variable declaration"));
                 recovery();
             }
         }
+        return null;
     }
 
     private SentenceNode staticMethodOrLocalVar(Token classIdtoken) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.PERIOD)) {
-            var staticMethodCall = new StaticCallNode(classIdtoken);
+            var staticMethodCall = new StaticCallExpressionNode(classIdtoken);
             match(Token.TokenType.PERIOD);
             var methodToken = currentToken;
             match(Token.TokenType.METVARID);
             staticMethodCall.addMethodCalled(methodToken);
             staticMethodCall.addArguments(actualArgs());
-            reference2();     //TODO finish this. Add chained calls to static method call
-            compoundExpression2();
-            expression2();
+            staticMethodCall.addChain(reference2());     //TODO finish this. Add chained calls to static method call
+            //compoundExpression2();     //ASK if I can remove this
+            var exp = expression2();
+            var assignmentExp = optionalTernaryOperator(exp);
+
+            if(exp != null){ //If this is an assignment
+                var assignment = new AssignmentNode();
+                assignment.addLeftSide(staticMethodCall);
+                assignment.addRightSide(assignmentExp);
+                return assignment;
+            } else{ //If this is a call
+                //TODO throw exception if assignmentExp != null (Ternary operator appllied over staitc call, not a statement)
+                return new StaticCallSentenceNode(staticMethodCall);
+            }
+
+
         } else { //TODO implement classic variable declaration in AST
             optionalGenerics();
             match(Token.TokenType.METVARID);
@@ -610,25 +624,32 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private void expressionWOStaticMethodCall() throws LexicalException {
-        compoundExpressionWOStaticMethodCall();
-        expression2();
+    private AssignmentNode expressionWOStaticMethodCall() throws LexicalException {
+        var assignment = new AssignmentNode();
+        assignment.addLeftSide(compoundExpressionWOStaticMethodCall());
+        var exp = expression2();
+        var rightSide = optionalTernaryOperator(exp);
+        assignment.addRightSide(rightSide);
+        return assignment;
     }
 
-    private void compoundExpressionWOStaticMethodCall() throws LexicalException {
+    private ExpressionNode compoundExpressionWOStaticMethodCall() throws LexicalException {
         basicExpression();
         compoundExpression2();
+        return new MockExpressionNode(); //TODO
     }
 
-    private void localVarWithVar() throws LexicalException {
+    private VarInitNode localVarWithVar() throws LexicalException {
         var varInitNode = new VarInitNode();
         match(Token.TokenType.VAR_WORD);
         Token token = currentToken;
         match((Token.TokenType.METVARID));
         varInitNode.addToken(token);
         match(Token.TokenType.EQUAL);
-        varInitNode.addExpression(compoundExpression());
-        optionalTernaryOperator();
+        var exp = compoundExpression();
+        var ternaryExp = optionalTernaryOperator(exp);
+        varInitNode.addExpression(ternaryExp);
+        return varInitNode;
     }
 
     private void localVarWithPrimitiveType() throws LexicalException {
@@ -742,28 +763,41 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private ExpressionNode expression() throws LexicalException {
         compoundExpression();
-        expression2();
-        optionalTernaryOperator();
+        var exp = expression2();
+        optionalTernaryOperator(exp);
         return new MockExpressionNode(); //TODO
     }
 
-    private void expression2() throws LexicalException {
+    private ExpressionNode expression2() throws LexicalException {
         if (first(NonTerminal.ASSIGNMENT_OPERATOR).contains(currentToken.getTokenType())) {
             assignmentOperator();
             compoundExpression();
         } else {
+            return null;
             //Empty production
         }
+        return new MockExpressionNode();
     }
 
-    private void optionalTernaryOperator() throws LexicalException {
+    private ExpressionNode optionalTernaryOperator(ExpressionNode condition) throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.QUESTION_MARK)) {
-            retrieveNextToken();
-            compoundExpression();
+            match(Token.TokenType.QUESTION_MARK);
+            var conditionalExpression = new ConditionalExpression();
+            conditionalExpression.addCondition(condition);
+
+            var trueExpression = compoundExpression();
+            var ternaryTrueExp = optionalTernaryOperator(trueExpression);
+            conditionalExpression.addTrueExpression(ternaryTrueExp);
+
             match(Token.TokenType.COLON);
-            compoundExpression();
-            optionalTernaryOperator();
+
+            var falseExpression = compoundExpression();
+            var ternaryFalseExp = optionalTernaryOperator(falseExpression);
+            conditionalExpression.addFalseExpression(ternaryFalseExp);
+
+            return conditionalExpression;
         } else {
+            return condition;
             //Empty produciton
         }
     }
@@ -884,11 +918,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         reference2();
     }
 
-    private void reference2() throws LexicalException {
+    private Chained reference2() throws LexicalException {
         if (first(NonTerminal.CHAINED_VAR_METHOD).contains(currentToken.getTokenType())) {
-            chainedVarMethod();
+            var chain = chainedVarMethod();
             reference2();
+            //chain.addChain(reference2()); //TODO reference2() should be called like this. chanedVarMethod return null atm, when the method is finished I should change this call
+            return chain;
         } else {
+            return null;
             //empty production
         }
     }
@@ -978,10 +1015,11 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private void chainedVarMethod() throws LexicalException {
+    private Chained chainedVarMethod() throws LexicalException {
         match(Token.TokenType.PERIOD);
         match(Token.TokenType.METVARID);
         optionalActualArgs();
+        return null; //TODO implement chained methods and attributes
     }
 
     private void optionalActualArgs() throws LexicalException {

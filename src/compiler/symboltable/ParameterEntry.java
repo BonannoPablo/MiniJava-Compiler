@@ -18,30 +18,6 @@ public class ParameterEntry {
     }
 
     public void checkDeclaration() throws SemanticException {
-      /*  Token containerClassGenericType = symbolTable.getCurrentClass().getGenericType();
-        boolean genericTypeMatch = containerClassGenericType != null && type.getToken().getLexeme().equals(containerClassGenericType.getLexeme());
-        boolean existsTypeClass = symbolTable.existsClass(type.getName());
-
-        if(type.getToken().getTokenType() == Token.TokenType.CLASSID
-        && ! (existsTypeClass || genericTypeMatch))
-                throw new SemanticException("Class does not exist", type.getToken()); //TODO change msg
-
-        boolean hasGenericType = !type.getGenericType().isEmpty();
-        boolean existsGenericType = symbolTable.existsClass(type.getGenericType());
-
-        if( hasGenericType &&
-           ! (existsGenericType || (containerClassGenericType != null && type.getGenericType().equals(containerClassGenericType.getLexeme()))))
-            throw new SemanticException("Class does not exist", type.getGenericTypeToken());
-
-        boolean declaredClassHasGenericType = existsTypeClass && symbolTable.getClassEntry(type.getName()).getGenericType() != null;
-        boolean parameterTypeHasGenericType = !type.getGenericType().isEmpty() && symbolTable.getClassEntry(type.getGenericType()).getGenericType() != null;
-
-        if(true){}
-        //TODO finish parameter checking
-*/
-
-
-
 
         if(type.getToken().getTokenType() == Token.TokenType.CLASSID) {
 
@@ -70,11 +46,8 @@ public class ParameterEntry {
                     if (!(existsGenericTypeClass || containerClassGenericTypeMatch))
                         throw new SemanticException("Class does not exist", type.getToken());
                 }
-
             }
         }
-
-
     }
 
     public Type getType() {

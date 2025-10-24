@@ -20,6 +20,8 @@ public class VarInitNode extends SentenceNode{
 
         @Override
     public void print(int level) {
-        //TODO
+        System.out.println(" ".repeat(level)+"VAR INIT");
+        System.out.println(" ".repeat(level)+"name: " + name);
+        expression.print(level+1);
     }
 }

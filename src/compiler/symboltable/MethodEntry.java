@@ -156,7 +156,7 @@ public class MethodEntry{
     public void printAST() {
         System.out.println("Method: " + name);
         if(block != null)
-            block.print(0);
+            block.print(1);
         else
             System.out.println("No block");
     }

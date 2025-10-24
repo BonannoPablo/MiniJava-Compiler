@@ -7,10 +7,14 @@ public class WhileNode extends SentenceNode{
     @Override
     public void print(int level){
         System.out.println(" ".repeat(level)+"WHILE");
-        if(condition != null)
-            condition.print(level+1);
-        if(body != null)
-            body.print(level+1);
+        if(condition != null) {
+            System.out.println(" ".repeat(level)+"condition");
+            condition.print(level + 1);
+        }
+        if(body != null) {
+            System.out.println(" ".repeat(level)+"body");
+            body.print(level + 1);
+        }
     }
 
     public void addCondition(ExpressionNode s){
