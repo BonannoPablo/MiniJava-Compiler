@@ -5,7 +5,7 @@ import compiler.token.Token;
 
 import java.util.List;
 
-public class StaticCallExpressionNode extends ExpressionNode{
+public class StaticCallExpressionNode extends Primary{
     Token classCalledToken;
     String classCalledName;
     Token methodCalledToken;
@@ -26,10 +26,6 @@ public class StaticCallExpressionNode extends ExpressionNode{
         this.arguments = arguments;
     }
 
-    public void addChain(Chained chain){
-        this.chain = chain;
-    }
-
     @Override
     public void print(int level) {
         System.out.println(" ".repeat(level)+"STATIC CALL EXPRESSION");
@@ -38,7 +34,9 @@ public class StaticCallExpressionNode extends ExpressionNode{
         for(ExpressionNode e : arguments){
             e.print(level+1);
         }
-
+        if(chain != null){
+            chain.print(level+1);
+        }
 
     }
 

@@ -9,6 +9,7 @@ public class ExpressionSentenceNode extends SentenceNode{
 
     @Override
     public void print(int level) {
-
+        System.out.println(" ".repeat(level)+"EXPRESSION SENTENCE");
+        expression.print(level+1);
     }
 }

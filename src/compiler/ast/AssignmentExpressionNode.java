@@ -1,6 +1,8 @@
 package compiler.ast;
 
-public class AssignmentNode extends SentenceNode {
+import compiler.symboltable.types.Type;
+
+public class AssignmentExpressionNode extends ExpressionNode{
     ExpressionNode leftSide;
     ExpressionNode rightSide;
 
@@ -13,13 +15,16 @@ public class AssignmentNode extends SentenceNode {
         rightSide.print(level+1);
     }
 
+    @Override
+    public Type getType() {
+        return null;
+    }
+
     public void addLeftSide(ExpressionNode e) {
         leftSide = e;
     }
     public void addRightSide(ExpressionNode e) {
         rightSide = e;
     }
-
-
 
 }

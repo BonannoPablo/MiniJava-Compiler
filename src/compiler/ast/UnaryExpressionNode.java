@@ -14,7 +14,9 @@ public class UnaryExpressionNode extends ExpressionNode{
 
     @Override
     public void print(int i) {
-
+        System.out.println(" ".repeat(i)+"UNARY EXPRESSION");
+        System.out.println(" ".repeat(i)+"UnaryOperator: "+unaryOperator.getLexeme());
+        expression.print(i+1);
     }
 
     @Override

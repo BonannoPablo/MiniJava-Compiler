@@ -16,8 +16,14 @@ public class BinaryExpression extends ExpressionNode{
 
 
     @Override
-    public void print(int i) {
-
+    public void print(int level) {
+        System.out.println(" ".repeat(level)+"BINARY EXPRESSION");
+        System.out.println(" ".repeat(level)+"left expression:");
+        left.print(level+1);
+        System.out.println(" ".repeat(level)+"right expression:");
+        right.print(level+1);
+        System.out.println(" ".repeat(level)+"operator:");
+        System.out.println(" ".repeat(level+1)+operator.getLexeme());
     }
 
     @Override

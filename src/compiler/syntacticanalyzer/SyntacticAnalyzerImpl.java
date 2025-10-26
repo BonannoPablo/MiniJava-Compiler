@@ -599,20 +599,20 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             match(Token.TokenType.METVARID);
             staticMethodCall.addMethodCalled(methodToken);
             staticMethodCall.addArguments(actualArgs());
-            staticMethodCall.addChain(reference2());     //TODO finish this. Add chained calls to static method call
+            staticMethodCall.addChain(reference2());
             var binaryOp = currentToken;
             var binaryExp = compoundExpression2(staticMethodCall);     //I can check if this is different from staticMethodCall, and if it is throw an exception
             var assignmentOp = currentToken;
-            var exp = expression2();
+            var exp = expression2(staticMethodCall); //TODO either change the way expresion2 handles node creation or change where I call ternary operator
             var assignmentExp = optionalTernaryOperator(exp);
 
-            if(exp != null){ //If this is an assignment
+            if(exp != staticMethodCall){ //If this is an assignment
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Non assignable left side", assignmentOp);
-                var assignment = new AssignmentNode();
+                var assignment = new AssignmentExpressionNode();
                 assignment.addLeftSide(staticMethodCall);
                 assignment.addRightSide(assignmentExp);
-                return assignment;
+                return new AssignmentSentenceNode(assignment);
             } else{ //If this is a call
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Not a statement", binaryOp);
@@ -633,14 +633,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private SentenceNode expressionWOStaticMethodCall() throws LexicalException {
 
         var compoundExpression = compoundExpressionWOStaticMethodCall();
-        var exp = expression2();
+        var exp = expression2(compoundExpression);
         var rightSide = optionalTernaryOperator(exp);
         if(exp != null){ //If it's an assignment
-            var assignment = new AssignmentNode();
+            var assignment = new AssignmentExpressionNode();
             assignment.addLeftSide(compoundExpression);
             assignment.addRightSide(rightSide);
-            return assignment;
-        } else{ /
+            return new AssignmentSentenceNode(assignment);
+        } else{
             //TODO throw exception if assignmentExp != null (Ternary operator appllied over staitc call, not a statement)
             return new ExpressionSentenceNode(compoundExpression);
 
@@ -732,18 +732,20 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private ReturnNode returnSentence() throws LexicalException {
         var node = new ReturnNode();
         match(Token.TokenType.RETURN_WORD);
-        node.addReturnExpression(optionalExpression());
+        var exp = optionalExpression();
+        if(exp != null)
+            node.addReturnExpression(exp);
         return node;
     }
 
     private ExpressionNode optionalExpression() throws LexicalException {
         if (first(NonTerminal.EXPRESSION).contains(currentToken.getTokenType())) {
-            expression();
+            return expression();
         }
-        return new MockExpressionNode(); //TODO
+        return null; //TODO
     }
 
-    private IfNode ifSentence() throws LexicalException {
+    private IfNode ifSentence() throws LexicalException, SemanticException {
         IfNode node = new IfNode();
         match(Token.TokenType.IF_WORD);
         match(Token.TokenType.OPENING_PAREN);
@@ -754,7 +756,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return node;
     }
 
-    private SentenceNode elseSentence() throws LexicalException {
+    private SentenceNode elseSentence() throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.ELSE_WORD)) {
             retrieveNextToken();
             return sentence();
@@ -764,7 +766,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private WhileNode whileSentence() throws LexicalException {
+    private WhileNode whileSentence() throws LexicalException, SemanticException {
         var node = new WhileNode();
         match(Token.TokenType.WHILE_WORD);
         match(Token.TokenType.OPENING_PAREN);
@@ -775,21 +777,22 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private ExpressionNode expression() throws LexicalException {
-        compoundExpression();
-        var exp = expression2();
-        optionalTernaryOperator(exp);
-        return new MockExpressionNode(); //TODO
+        var exp = compoundExpression();
+        exp = expression2(exp);
+        return optionalTernaryOperator(exp);
     }
 
-    private ExpressionNode expression2() throws LexicalException {
+    private ExpressionNode expression2(ExpressionNode expressionNode) throws LexicalException {
         if (first(NonTerminal.ASSIGNMENT_OPERATOR).contains(currentToken.getTokenType())) {
             assignmentOperator();
-            compoundExpression();
+            var assignment= new AssignmentExpressionNode();
+            assignment.addLeftSide(expressionNode);
+            assignment.addRightSide(compoundExpression());
+            return assignment;
         } else {
-            return null;
+            return expressionNode;
             //Empty production
         }
-        return new MockExpressionNode();
     }
 
     private ExpressionNode optionalTernaryOperator(ExpressionNode condition) throws LexicalException {
@@ -833,7 +836,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 recovery();
             }
         }
-        return new MockExpressionNode(); //TODO
+        return new MockExpressionNode();
     }
 
     private ExpressionNode compoundExpression2(ExpressionNode leftExpression) throws LexicalException {
@@ -887,6 +890,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                 recovery();
             }
         }
+        return null;
     }
 
     private void unaryOperator() throws LexicalException {
@@ -925,16 +929,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         Primitive primitive = null;
         switch (currentToken.getTokenType()) { //TODO define literals
             case Token.TokenType.INTLITERAL:
-                primitive = new IntLiteral();
+                primitive = new IntLiteral(tk);
                 break;
             case Token.TokenType.CHARLITERAL:
-                primitive = new CharLiteral();
+                primitive = new CharLiteral(tk);
                 break;
-            case Token.TokenType.TRUE_WORD:
-                primitive = new BooleanLiteral();
-                break;
-            case Token.TokenType.FALSE_WORD:
-                primitive = new BooleanLiteral();
+            case Token.TokenType.TRUE_WORD, Token.TokenType.FALSE_WORD:
+                primitive = new BooleanLiteral(tk);
                 break;
             case Token.TokenType.NULL_WORD:
                 primitive = new NullPrimitive();
@@ -950,16 +951,16 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     }
 
-    private void reference() throws LexicalException {
+    private Primary reference() throws LexicalException {
         var primary = primary();
         primary.addChain(reference2());
+        return primary;
     }
 
     private Chained reference2() throws LexicalException {
         if (first(NonTerminal.CHAINED_VAR_METHOD).contains(currentToken.getTokenType())) {
             var chain = chainedVarMethod();
-            reference2();
-            //chain.addChain(reference2()); //TODO reference2() should be called like this. chanedVarMethod return null atm, when the method is finished I should change this call
+            chain.addChain(reference2()); //TODO reference2() should be called like this. chanedVarMethod return null atm, when the method is finished I should change this call
             return chain;
         } else {
             return null;
@@ -967,24 +968,24 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ExpressionNode primary() throws LexicalException {
+    private Primary primary() throws LexicalException {
+        var tk = currentToken;
         switch (currentToken.getTokenType()) {
             case Token.TokenType.THIS_WORD:
                 match(Token.TokenType.THIS_WORD);
                 return new ThisPrimaryNode();
             case Token.TokenType.STRINGLITERAL:
                 match(Token.TokenType.STRINGLITERAL);
-                return new StringPrimaryNode();
+                return new StringLiteral(tk);
             case Token.TokenType.OPENING_PAREN:
                 return parenthesizedExpression();
             case Token.TokenType.METVARID:
-                varAccessMethodCall();
-                break;
+                return varAccessMethodCall();
             default:
                 if (first(NonTerminal.CONSTRUCTOR_CALL).contains(currentToken.getTokenType())) {
-                    constructorCall();
+                    return constructorCall(); //TODO
                 } else if (first(NonTerminal.STATIC_METHOD_CALL).contains(currentToken.getTokenType())) {
-                    staticMethodCall();
+                    return staticMethodCall();
                 } else {
                     if (!panicMode) {
                         exceptions.add(new SyntacticException(currentToken, "a primary"));
@@ -992,26 +993,41 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
                     }
                 }
         }
+        return null;
     }
 
-    private void varAccessMethodCall() throws LexicalException {
+    private Primary varAccessMethodCall() throws LexicalException {
         var tk = currentToken;
         match(Token.TokenType.METVARID);
-        optionalActualArgs(tk);
+        var args = optionalActualArgs();
+        if(args != null){ //It's a method call
+            var methodCall = new MethodCallExpression(tk);
+            methodCall.addArguments(args);
+            return methodCall;
+        }else{
+            var varAccess = new VarAccessNode(tk);
+            return varAccess;
+        }
     }
 
-    private void constructorCall() throws LexicalException {
+    private ConstructorCallNode constructorCall() throws LexicalException {
         match(Token.TokenType.NEW_WORD);
+        var classIdToken = currentToken;
         match(Token.TokenType.CLASSID);
-        optionalGenericsOrDiamond();
+        var constructorCall = new ConstructorCallNode(classIdToken);
+
+        optionalGenericsOrDiamond();  //TODO add generic type to constructor call
+
         actualArgs();
+        constructorCall.addArguments(actualArgs());
+        return constructorCall;
     }
 
-    private ExpressionNode parenthesizedExpression() throws LexicalException {
+    private PrimaryExpression parenthesizedExpression() throws LexicalException {
         match(Token.TokenType.OPENING_PAREN);
         var exp = expression();
         match(Token.TokenType.CLOSING_PAREN);
-        return exp;
+        return new PrimaryExpression(exp);
     }
 
     private StaticCallExpressionNode staticMethodCall() throws LexicalException {
@@ -1063,15 +1079,21 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private Chained chainedVarMethod() throws LexicalException {
         match(Token.TokenType.PERIOD);
+        var metVar = currentToken;
         match(Token.TokenType.METVARID);
-        optionalActualArgs();
-        return null; //TODO implement chained methods and attributes
+        var args = optionalActualArgs();
+        if(args != null){ //It's a method call
+            return new ChainedCall(metVar);
+        } else { //It's attribute access
+            return new ChainedAttribute(metVar);
+        }
     }
 
-    private void optionalActualArgs() throws LexicalException {
+    private List<ExpressionNode> optionalActualArgs() throws LexicalException {
         if (first(NonTerminal.ACTUAL_ARGS).contains(currentToken.getTokenType())) {
-            actualArgs();
+            return actualArgs();
         } else {
+            return null;
             //Empty production
         }
     }

@@ -6,7 +6,7 @@ public class NullPrimitive extends Primitive{
 
     @Override
     public void print(int i) {
-
+        System.out.println(" ".repeat(i)+"NULL PRIMITIVE");
     }
 
     @Override
