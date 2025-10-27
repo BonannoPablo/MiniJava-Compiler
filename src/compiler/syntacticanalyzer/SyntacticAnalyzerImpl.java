@@ -604,15 +604,12 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             var binaryExp = compoundExpression2(staticMethodCall);     //I can check if this is different from staticMethodCall, and if it is throw an exception
             var assignmentOp = currentToken;
             var exp = expression2(staticMethodCall); //TODO either change the way expresion2 handles node creation or change where I call ternary operator
-            var assignmentExp = optionalTernaryOperator(exp);
+
 
             if(exp != staticMethodCall){ //If this is an assignment
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Non assignable left side", assignmentOp);
-                var assignment = new AssignmentExpressionNode();
-                assignment.addLeftSide(staticMethodCall);
-                assignment.addRightSide(assignmentExp);
-                return new AssignmentSentenceNode(assignment);
+                return new AssignmentSentenceNode(exp);
             } else{ //If this is a call
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Not a statement", binaryOp);
@@ -634,16 +631,11 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
         var compoundExpression = compoundExpressionWOStaticMethodCall();
         var exp = expression2(compoundExpression);
-        var rightSide = optionalTernaryOperator(exp);
-        if(exp != null){ //If it's an assignment
-            var assignment = new AssignmentExpressionNode();
-            assignment.addLeftSide(compoundExpression);
-            assignment.addRightSide(rightSide);
-            return new AssignmentSentenceNode(assignment);
+        if(exp instanceof AssignmentExpressionNode){ //If it's an assignment
+            return new AssignmentSentenceNode(exp);
         } else{
             //TODO throw exception if assignmentExp != null (Ternary operator appllied over staitc call, not a statement)
-            return new ExpressionSentenceNode(compoundExpression);
-
+            return new ExpressionSentenceNode(exp);
         }
     }
 
@@ -779,7 +771,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private ExpressionNode expression() throws LexicalException {
         var exp = compoundExpression();
         exp = expression2(exp);
-        return optionalTernaryOperator(exp);
+        return exp;
     }
 
     private ExpressionNode expression2(ExpressionNode expressionNode) throws LexicalException {
@@ -787,10 +779,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             assignmentOperator();
             var assignment= new AssignmentExpressionNode();
             assignment.addLeftSide(expressionNode);
-            assignment.addRightSide(compoundExpression());
+            assignment.addRightSide(optionalTernaryOperator(compoundExpression()));
             return assignment;
         } else {
-            return expressionNode;
+            return optionalTernaryOperator(expressionNode);
             //Empty production
         }
     }

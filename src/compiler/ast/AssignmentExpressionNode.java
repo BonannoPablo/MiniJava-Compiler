@@ -8,7 +8,7 @@ public class AssignmentExpressionNode extends ExpressionNode{
 
     @Override
     public void print(int level) {
-        System.out.println(" ".repeat(level)+"ASSIGNMENT");
+        System.out.println(" ".repeat(level)+"ASSIGNMENT EXPRESSION");
         System.out.println(" ".repeat(level)+"left side:");
         leftSide.print(level+1);
         System.out.println(" ".repeat(level)+"right side:");
