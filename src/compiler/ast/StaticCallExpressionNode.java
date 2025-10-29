@@ -10,7 +10,6 @@ public class StaticCallExpressionNode extends Primary{
     String classCalledName;
     Token methodCalledToken;
     List<ExpressionNode> arguments;
-    Chained chain;
 
 
     public StaticCallExpressionNode(Token classCalledToken){

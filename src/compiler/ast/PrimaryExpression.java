@@ -13,6 +13,10 @@ public class PrimaryExpression extends Primary{
     public void print(int i) {
         System.out.println(" ".repeat(i)+"PRIMARY EXPRESSION");
         expression.print(i+1);
+
+        if(chain != null){
+            chain.print(i+1);
+        }
     }
 
     @Override

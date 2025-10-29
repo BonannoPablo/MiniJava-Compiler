@@ -24,6 +24,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private Token currentToken;
     private Queue<SyntacticException> exceptions;
     private boolean panicMode = false;
+    private BlockNode currentBlock;
 
     private enum NonTerminal {
         CLASS_AND_INTERFACE_LIST2,
@@ -190,7 +191,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private void optionalExtends() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.EXTENDS_WORD)) {
-            retrieveNextToken();
+            match(Token.TokenType.EXTENDS_WORD);
             var interfaceClass = currentToken;
             match(Token.TokenType.CLASSID);
             symbolTable.getCurrentInterface().setParent(interfaceClass);
@@ -203,7 +204,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private void optionalGenericsOrDiamond() throws LexicalException {
         if (currentToken.getTokenType().equals(Token.TokenType.LESS_THAN)) {
-            retrieveNextToken();
+            match(Token.TokenType.LESS_THAN);
             optionalClassId();
             match(Token.TokenType.GREATER_THAN);
         } else {
@@ -534,10 +535,15 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private BlockNode block() throws LexicalException, SemanticException {
         BlockNode block = new BlockNode();
+        block.setParent(currentBlock);
+        currentBlock = block;
 
         match(Token.TokenType.OPENING_BRACE);
         sentenceList(block);
         match(Token.TokenType.CLOSING_BRACE);
+
+        currentBlock = currentBlock.getParent();
+
         return block;
     }
 
@@ -567,8 +573,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             return node;
         } else {
             match(Token.TokenType.SEMICOLON);
+            return new MockSentenceNode();
         }
-        return null;
     }
 
     private SentenceNode assignmentCallOrLocalVar() throws LexicalException, SemanticException {
@@ -609,7 +615,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             if(exp != staticMethodCall){ //If this is an assignment
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Non assignable left side", assignmentOp);
-                return new AssignmentSentenceNode(exp);
+                if(exp instanceof AssignmentExpressionNode)
+                    return new AssignmentSentenceNode(exp);
+                else
+                    throw new SemanticException("Not a sentence", assignmentOp); //TODO setup
             } else{ //If this is a call
                 if(binaryExp != staticMethodCall)
                     throw new SemanticException("Not a statement", binaryOp);
@@ -644,12 +653,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return compoundExpression2(exp);
     }
 
-    private VarInitNode localVarWithVar() throws LexicalException {
+    private VarInitNode localVarWithVar() throws LexicalException, SemanticException {
         var varInitNode = new VarInitNode();
         match(Token.TokenType.VAR_WORD);
         Token token = currentToken;
         match((Token.TokenType.METVARID));
         varInitNode.addToken(token);
+        currentBlock.addLocalVar(token);
         match(Token.TokenType.EQUAL);
         var exp = compoundExpression();
         var ternaryExp = optionalTernaryOperator(exp);
@@ -945,6 +955,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private Primary reference() throws LexicalException {
         var primary = primary();
+        assert primary != null; //TODO delete this when multiple exception is handled
         primary.addChain(reference2());
         return primary;
     }
@@ -1010,7 +1021,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
         optionalGenericsOrDiamond();  //TODO add generic type to constructor call
 
-        actualArgs();
         constructorCall.addArguments(actualArgs());
         return constructorCall;
     }

@@ -21,10 +21,14 @@ public class ConstructorCallNode extends Primary{
     @Override
     public void print(int i) {
         System.out.println(" ".repeat(i)+"CONSTRUCTOR CALL: ");
-        System.out.println(" ".repeat(i)+"ClassName: "+className);
+        System.out.println(" ".repeat(i)+"ClassName: " + className.getLexeme());
         System.out.println(" ".repeat(i)+"Arguments: ");
         for(ExpressionNode arg: arguments){
             arg.print(i+1);
+        }
+
+        if(chain != null){
+            chain.print(i+1);
         }
     }
 

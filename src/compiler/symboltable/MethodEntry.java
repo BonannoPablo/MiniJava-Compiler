@@ -160,4 +160,8 @@ public class MethodEntry{
         else
             System.out.println("No block");
     }
+
+    public boolean hasParameter(String name) {
+        return parametersNames.contains(name);
+    }
 }

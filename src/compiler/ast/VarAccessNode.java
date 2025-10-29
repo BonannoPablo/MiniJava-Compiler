@@ -15,7 +15,11 @@ public class VarAccessNode extends Primary{
     @Override
     public void print(int i) {
         System.out.println(" ".repeat(i)+"VAR ACCESS NODE");
-        System.out.println(" ".repeat(i)+"VarName: "+varName);
+        System.out.println(" ".repeat(i)+"VarName: " + varName.getLexeme());
+
+        if(chain != null){
+            chain.print(i+1);
+        }
     }
 
     @Override
