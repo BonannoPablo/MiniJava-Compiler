@@ -1,6 +1,12 @@
 package compiler.syntacticanalyzer;
 
-import compiler.ast.*;
+import compiler.ast.expressions.chain.Chained;
+import compiler.ast.expressions.chain.ChainedAttribute;
+import compiler.ast.expressions.chain.ChainedCall;
+import compiler.ast.expressions.*;
+import compiler.ast.expressions.primary.*;
+import compiler.ast.expressions.primitive.*;
+import compiler.ast.sentences.*;
 import compiler.exceptions.LexicalException;
 import compiler.exceptions.SemanticException;
 import compiler.exceptions.SyntacticException;
@@ -24,7 +30,6 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     private Token currentToken;
     private Queue<SyntacticException> exceptions;
     private boolean panicMode = false;
-    private BlockNode currentBlock;
 
     private enum NonTerminal {
         CLASS_AND_INTERFACE_LIST2,
@@ -425,7 +430,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return optionalBlock();
     }
 
-    private void optionalAssignment() throws LexicalException {
+    private void optionalAssignment() throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.EQUAL)) {
             retrieveNextToken();
             var exp = compoundExpression();
@@ -503,14 +508,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private void formalArgsList() throws LexicalException, SemanticException {
-        symbolTable.getCurrentClassOrInterface().getCurrentMethod().addParameter(formalArg());
+        symbolTable.getCurrentMethod().addParameter(formalArg());
         formalArgsList2();
     }
 
     private void formalArgsList2() throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             match(Token.TokenType.COMMA);
-            symbolTable.getCurrentClassOrInterface().getCurrentMethod().addParameter(formalArg());
+            symbolTable.getCurrentMethod().addParameter(formalArg());
             formalArgsList2();
         } else {
             //Empty production
@@ -535,14 +540,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     private BlockNode block() throws LexicalException, SemanticException {
         BlockNode block = new BlockNode();
-        block.setParent(currentBlock);
-        currentBlock = block;
+        block.setParent(symbolTable.getCurrentBlock());
+        symbolTable.setCurrentBlock(block);
 
         match(Token.TokenType.OPENING_BRACE);
         sentenceList(block);
         match(Token.TokenType.CLOSING_BRACE);
 
-        currentBlock = currentBlock.getParent();
+        symbolTable.setCurrentBlock(symbolTable.getCurrentBlock().getParent());
 
         return block;
     }
@@ -636,7 +641,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private SentenceNode expressionWOStaticMethodCall() throws LexicalException {
+    private SentenceNode expressionWOStaticMethodCall() throws LexicalException, SemanticException {
 
         var compoundExpression = compoundExpressionWOStaticMethodCall();
         var exp = expression2(compoundExpression);
@@ -648,7 +653,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ExpressionNode compoundExpressionWOStaticMethodCall() throws LexicalException {
+    private ExpressionNode compoundExpressionWOStaticMethodCall() throws LexicalException, SemanticException {
         var exp = basicExpression();
         return compoundExpression2(exp);
     }
@@ -659,7 +664,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         Token token = currentToken;
         match((Token.TokenType.METVARID));
         varInitNode.addToken(token);
-        currentBlock.addLocalVar(token);
+        symbolTable.getCurrentBlock().addLocalVar(varInitNode);
         match(Token.TokenType.EQUAL);
         var exp = compoundExpression();
         var ternaryExp = optionalTernaryOperator(exp);
@@ -667,7 +672,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return varInitNode;
     }
 
-    private void localVarWithPrimitiveType() throws LexicalException {
+    private void localVarWithPrimitiveType() throws LexicalException, SemanticException {
         primitiveType();
         match(Token.TokenType.METVARID);
         multipleDeclaration();
@@ -731,8 +736,8 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ReturnNode returnSentence() throws LexicalException {
-        var node = new ReturnNode();
+    private ReturnNode returnSentence() throws LexicalException, SemanticException {
+        var node = new ReturnNode(currentToken);
         match(Token.TokenType.RETURN_WORD);
         var exp = optionalExpression();
         if(exp != null)
@@ -740,7 +745,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return node;
     }
 
-    private ExpressionNode optionalExpression() throws LexicalException {
+    private ExpressionNode optionalExpression() throws LexicalException, SemanticException {
         if (first(NonTerminal.EXPRESSION).contains(currentToken.getTokenType())) {
             return expression();
         }
@@ -748,7 +753,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private IfNode ifSentence() throws LexicalException, SemanticException {
-        IfNode node = new IfNode();
+        IfNode node = new IfNode(currentToken);
         match(Token.TokenType.IF_WORD);
         match(Token.TokenType.OPENING_PAREN);
         node.addCondition(expression());
@@ -769,7 +774,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
     }
 
     private WhileNode whileSentence() throws LexicalException, SemanticException {
-        var node = new WhileNode();
+        var node = new WhileNode(currentToken);
         match(Token.TokenType.WHILE_WORD);
         match(Token.TokenType.OPENING_PAREN);
         node.addCondition(expression());
@@ -778,13 +783,13 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return node;
     }
 
-    private ExpressionNode expression() throws LexicalException {
+    private ExpressionNode expression() throws LexicalException, SemanticException {
         var exp = compoundExpression();
         exp = expression2(exp);
         return exp;
     }
 
-    private ExpressionNode expression2(ExpressionNode expressionNode) throws LexicalException {
+    private ExpressionNode expression2(ExpressionNode expressionNode) throws LexicalException, SemanticException {
         if (first(NonTerminal.ASSIGNMENT_OPERATOR).contains(currentToken.getTokenType())) {
             assignmentOperator();
             var assignment= new AssignmentExpressionNode();
@@ -797,7 +802,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ExpressionNode optionalTernaryOperator(ExpressionNode condition) throws LexicalException {
+    private ExpressionNode optionalTernaryOperator(ExpressionNode condition) throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.QUESTION_MARK)) {
             match(Token.TokenType.QUESTION_MARK);
             var conditionalExpression = new ConditionalExpression();
@@ -824,7 +829,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         match(Token.TokenType.EQUAL);
     }
 
-    private ExpressionNode compoundExpression() throws LexicalException {
+    private ExpressionNode compoundExpression() throws LexicalException, SemanticException {
         if (first(NonTerminal.BASIC_EXPRESSION).contains(currentToken.getTokenType())) {
             var exp = basicExpression();
             return compoundExpression2(exp);
@@ -841,7 +846,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return new MockExpressionNode();
     }
 
-    private ExpressionNode compoundExpression2(ExpressionNode leftExpression) throws LexicalException {
+    private ExpressionNode compoundExpression2(ExpressionNode leftExpression) throws LexicalException, SemanticException {
         if (first(NonTerminal.BINARY_OPERATOR).contains(currentToken.getTokenType())) {
             var tk = currentToken;
             binaryOperator();
@@ -878,7 +883,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ExpressionNode basicExpression() throws LexicalException {
+    private ExpressionNode basicExpression() throws LexicalException, SemanticException {
         if (first(NonTerminal.UNARY_OPERATOR).contains(currentToken.getTokenType())) {
             var operatorTk = currentToken;
             unaryOperator();
@@ -912,7 +917,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private ExpressionNode operand() throws LexicalException {
+    private ExpressionNode operand() throws LexicalException, SemanticException {
         if (first(NonTerminal.PRIMITIVE).contains(currentToken.getTokenType())) {
             return primitive();
         } else if (first(NonTerminal.REFERENCE).contains(currentToken.getTokenType())) {
@@ -953,14 +958,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
 
     }
 
-    private Primary reference() throws LexicalException {
+    private Primary reference() throws LexicalException, SemanticException {
         var primary = primary();
         assert primary != null; //TODO delete this when multiple exception is handled
         primary.addChain(reference2());
         return primary;
     }
 
-    private Chained reference2() throws LexicalException {
+    private Chained reference2() throws LexicalException, SemanticException {
         if (first(NonTerminal.CHAINED_VAR_METHOD).contains(currentToken.getTokenType())) {
             var chain = chainedVarMethod();
             chain.addChain(reference2()); //TODO reference2() should be called like this. chanedVarMethod return null atm, when the method is finished I should change this call
@@ -971,7 +976,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private Primary primary() throws LexicalException {
+    private Primary primary() throws LexicalException, SemanticException {
         var tk = currentToken;
         switch (currentToken.getTokenType()) {
             case Token.TokenType.THIS_WORD:
@@ -999,7 +1004,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return null;
     }
 
-    private Primary varAccessMethodCall() throws LexicalException {
+    private Primary varAccessMethodCall() throws LexicalException, SemanticException {
         var tk = currentToken;
         match(Token.TokenType.METVARID);
         var args = optionalActualArgs();
@@ -1008,12 +1013,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodCall.addArguments(args);
             return methodCall;
         }else{
-            var varAccess = new VarAccessNode(tk);
-            return varAccess;
+            if(symbolTable.getCurrentBlock().containsLocalVar(tk.getLexeme()))
+                return new VarAccessNode(tk);
+            else
+                throw new SemanticException("Can't find symbol", tk);
         }
     }
 
-    private ConstructorCallNode constructorCall() throws LexicalException {
+    private ConstructorCallNode constructorCall() throws LexicalException, SemanticException {
         match(Token.TokenType.NEW_WORD);
         var classIdToken = currentToken;
         match(Token.TokenType.CLASSID);
@@ -1025,14 +1032,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return constructorCall;
     }
 
-    private PrimaryExpression parenthesizedExpression() throws LexicalException {
+    private PrimaryExpression parenthesizedExpression() throws LexicalException, SemanticException {
         match(Token.TokenType.OPENING_PAREN);
         var exp = expression();
         match(Token.TokenType.CLOSING_PAREN);
         return new PrimaryExpression(exp);
     }
 
-    private StaticCallExpressionNode staticMethodCall() throws LexicalException {
+    private StaticCallExpressionNode staticMethodCall() throws LexicalException, SemanticException {
         var classIdToken = currentToken;
         match(Token.TokenType.CLASSID);
         match(Token.TokenType.PERIOD);
@@ -1045,14 +1052,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         return call;
     }
 
-    private List<ExpressionNode> actualArgs() throws LexicalException {
+    private List<ExpressionNode> actualArgs() throws LexicalException, SemanticException {
         match(Token.TokenType.OPENING_PAREN);
         var expressionList = optionalExpressionList();
         match(Token.TokenType.CLOSING_PAREN);
         return expressionList;
     }
 
-    private List<ExpressionNode> optionalExpressionList() throws LexicalException {
+    private List<ExpressionNode> optionalExpressionList() throws LexicalException, SemanticException {
         if (first(NonTerminal.EXPRESSION_LIST).contains(currentToken.getTokenType())) {
             return expressionList();
         } else {
@@ -1061,14 +1068,14 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private List<ExpressionNode> expressionList() throws LexicalException {
+    private List<ExpressionNode> expressionList() throws LexicalException, SemanticException {
         var expressionList = new LinkedList<ExpressionNode>();
         expressionList.addLast(expression());
         expressionList2(expressionList);
         return expressionList;
     }
 
-    private List<ExpressionNode> expressionList2(List<ExpressionNode> expressionList) throws LexicalException {
+    private List<ExpressionNode> expressionList2(List<ExpressionNode> expressionList) throws LexicalException, SemanticException {
         if (currentToken.getTokenType().equals(Token.TokenType.COMMA)) {
             retrieveNextToken();
             expressionList.addLast(expression());
@@ -1079,7 +1086,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private Chained chainedVarMethod() throws LexicalException {
+    private Chained chainedVarMethod() throws LexicalException, SemanticException {
         match(Token.TokenType.PERIOD);
         var metVar = currentToken;
         match(Token.TokenType.METVARID);
@@ -1091,7 +1098,7 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         }
     }
 
-    private List<ExpressionNode> optionalActualArgs() throws LexicalException {
+    private List<ExpressionNode> optionalActualArgs() throws LexicalException, SemanticException {
         if (first(NonTerminal.ACTUAL_ARGS).contains(currentToken.getTokenType())) {
             return actualArgs();
         } else {

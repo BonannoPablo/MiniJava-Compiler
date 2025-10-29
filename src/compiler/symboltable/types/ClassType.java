@@ -10,6 +10,10 @@ public class ClassType extends Type{
         this.genericType = genericType;
     }
 
+    public ClassType(String name) {
+        super(name);
+    }
+
     public String getGenericType() {
         return genericType != null ? genericType.getLexeme() : "";
     }

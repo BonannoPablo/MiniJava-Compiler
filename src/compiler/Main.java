@@ -30,7 +30,7 @@ public class Main {
         try{
             syntacticAnalyzer.start();
             runSemanticAnalysis();
-
+            symbolTable.checkSentences();
         } catch(LexicalException e){
             printLexicalException(e);
             exceptionFlag = true;
@@ -52,7 +52,6 @@ public class Main {
         } catch (IOException e) {
             System.out.println("There has been an error when reading the source file");
         }
-
 
         symbolTable.printAST();
 

@@ -1,8 +1,7 @@
 package compiler.symboltable;
 
-import compiler.ast.BlockNode;
+import compiler.ast.sentences.BlockNode;
 import compiler.exceptions.SemanticException;
-import compiler.symboltable.types.ClassType;
 import compiler.symboltable.types.Type;
 import compiler.token.Token;
 import compiler.token.TokenImpl;
@@ -163,5 +162,10 @@ public class MethodEntry{
 
     public boolean hasParameter(String name) {
         return parametersNames.contains(name);
+    }
+
+    public void checkSentences() throws SemanticException {
+        if(block!= null)
+            block.check();
     }
 }

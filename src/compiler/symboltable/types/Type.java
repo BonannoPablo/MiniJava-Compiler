@@ -11,6 +11,10 @@ public abstract class Type {
         this.token = token;
     }
 
+    public Type(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

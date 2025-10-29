@@ -7,6 +7,10 @@ public class PrimitiveType extends Type{
         super(token);
     }
 
+    public PrimitiveType(String name) {
+        super(name);
+    }
+
     @Override
     public Token getGenericTypeToken() {
         return null;

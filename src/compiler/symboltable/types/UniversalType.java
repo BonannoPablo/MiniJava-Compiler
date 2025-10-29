@@ -5,8 +5,7 @@ import compiler.token.TokenImpl;
 
 public class UniversalType extends Type {
     public UniversalType() {
-        super(null);
-        name = "";
+        super("");
     }
 
     @Override

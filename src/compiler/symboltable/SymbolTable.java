@@ -1,5 +1,6 @@
 package compiler.symboltable;
 
+import compiler.ast.sentences.BlockNode;
 import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
@@ -13,6 +14,7 @@ public class SymbolTable {
     Map<String, InterfaceEntry> interfaceTable;
     ClassEntry currentClass;
     InterfaceEntry currentInterface;
+    private BlockNode currentBlock;
 
     public SymbolTable() {
         classTable = new Hashtable<>();
@@ -77,7 +79,8 @@ public class SymbolTable {
 
     public void printAST(){
         for(var c: classTable.values()){
-            c.printAST();
+            if(!(c.getName().equals("Object") || c.getName().equals("String") || c.getName().equals("System")) )
+                c.printAST();
         }
     }
 
@@ -123,6 +126,7 @@ public class SymbolTable {
 
     public void setCurrentClass(ClassEntry classEntry) {
         currentClass = classEntry;
+        currentInterface = null;
     }
 
     public TopLevelEntry getTopLevelEntry(String name) {
@@ -130,5 +134,24 @@ public class SymbolTable {
     }
     public boolean existsTopLevelEntry(String name) {
         return classTable.containsKey(name) || interfaceTable.containsKey(name);
+    }
+
+    public void checkSentences() throws SemanticException {
+        for(ClassEntry c : classTable.values()){
+            setCurrentClass(c);
+            c.checkSentences();
+        }
+    }
+
+    public MethodEntry getCurrentMethod(){
+        return getCurrentClassOrInterface().getCurrentMethod();
+    }
+
+    public BlockNode getCurrentBlock() {
+        return currentBlock;
+    }
+
+    public void setCurrentBlock(BlockNode currentBlock) {
+        this.currentBlock = currentBlock;
     }
 }

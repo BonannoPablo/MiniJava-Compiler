@@ -258,4 +258,11 @@ public class ClassEntry extends TopLevelEntry {
             method.printAST();
         }
     }
+
+    public void checkSentences() throws SemanticException {
+        for(MethodEntry m : methods.values()){
+            currentMethod = m;
+            m.checkSentences();
+        }
+    }
 }
