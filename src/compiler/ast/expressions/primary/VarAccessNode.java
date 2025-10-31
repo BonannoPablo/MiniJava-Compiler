@@ -20,8 +20,8 @@ public class VarAccessNode extends Primary{
         System.out.println(" ".repeat(i)+"VAR ACCESS NODE");
         System.out.println(" ".repeat(i)+"VarName: " + varToken.getLexeme());
 
-        if(chain != null){
-            chain.print(i+1);
+        if(chained != null){
+            chained.print(i+1);
         }
     }
 

@@ -14,7 +14,7 @@ public class CharLiteral extends Primitive{
 
     @Override
     public void print(int i) {
-        System.out.println(" ".repeat(i)+"CharLiteral: "+value);
+        System.out.println(" ".repeat(i)+"CharLiteral: " + value.getLexeme());
     }
 
     @Override

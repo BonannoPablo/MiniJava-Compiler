@@ -16,8 +16,8 @@ public class StringLiteral extends Primary{
     public void print(int i) {
         System.out.println(" ".repeat(i)+"StringLiteral: " + value.getLexeme());
 
-        if(chain != null){
-            chain.print(i+1);
+        if(chained != null){
+            chained.print(i+1);
         }
     }
 

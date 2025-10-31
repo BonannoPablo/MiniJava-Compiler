@@ -30,6 +30,7 @@ public class Main {
         try{
             syntacticAnalyzer.start();
             runSemanticAnalysis();
+            symbolTable.printAST();
             symbolTable.checkSentences();
         } catch(LexicalException e){
             printLexicalException(e);
@@ -53,7 +54,6 @@ public class Main {
             System.out.println("There has been an error when reading the source file");
         }
 
-        symbolTable.printAST();
 
     }
 

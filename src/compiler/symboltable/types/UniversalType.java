@@ -12,4 +12,9 @@ public class UniversalType extends Type {
     public Token getGenericTypeToken() {
         return null;
     }
+
+    @Override
+    public boolean conforms(Type t){
+        return true;
+    }
 }

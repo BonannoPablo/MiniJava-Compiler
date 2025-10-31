@@ -34,7 +34,6 @@ public class VarInitNode extends SentenceNode {
         type = expression.getType();
         if(type.getName().equals("null"))
             throw new SemanticException("Expression must not be null", token);
-        //TODO
     }
 
     public Type getType(){

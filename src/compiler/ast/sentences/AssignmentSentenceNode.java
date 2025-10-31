@@ -1,7 +1,10 @@
 package compiler.ast.sentences;
 
+import compiler.ast.expressions.AssignmentExpressionNode;
 import compiler.ast.expressions.ExpressionNode;
 import compiler.exceptions.SemanticException;
+import compiler.token.Token;
+import compiler.token.TokenImpl;
 
 public class AssignmentSentenceNode extends SentenceNode {
     ExpressionNode assignment;
@@ -18,8 +21,9 @@ public class AssignmentSentenceNode extends SentenceNode {
 
     @Override
     public void check() throws SemanticException {
-        //TODO
+        if(assignment instanceof AssignmentExpressionNode)
+            assignment.check();
+        else
+            throw new SemanticException("Not a sentence", new TokenImpl(Token.TokenType.PUBLIC_WORD,"placeholder",-1)); //TODO setup exception token
     }
-
-
 }

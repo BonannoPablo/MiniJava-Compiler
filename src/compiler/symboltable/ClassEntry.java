@@ -119,6 +119,7 @@ public class ClassEntry extends TopLevelEntry {
         if(constructors.put(constructor.getParameters().size(), constructor) != null)
             throw new SemanticException("Constructor already defined", constructor.getToken());
         currentMethod = constructor;
+
     }
 
     public void setParent(Token parent) throws SemanticException {
@@ -264,5 +265,9 @@ public class ClassEntry extends TopLevelEntry {
             currentMethod = m;
             m.checkSentences();
         }
+    }
+
+    public Token getParent() {
+        return parent;
     }
 }

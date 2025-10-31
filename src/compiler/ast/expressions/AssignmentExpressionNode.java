@@ -1,6 +1,13 @@
 package compiler.ast.expressions;
 
+import compiler.ast.expressions.chain.ChainedAttribute;
+import compiler.ast.expressions.primary.AttributeAccessNode;
+import compiler.ast.expressions.primary.Primary;
+import compiler.ast.expressions.primary.VarAccessNode;
+import compiler.exceptions.SemanticException;
 import compiler.symboltable.types.Type;
+import compiler.token.Token;
+import compiler.token.TokenImpl;
 
 public class AssignmentExpressionNode extends ExpressionNode {
     ExpressionNode leftSide;
@@ -16,8 +23,17 @@ public class AssignmentExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void check() {
-        //TODO
+    public void check() throws SemanticException {
+        leftSide.check();
+        rightSide.check();
+
+
+        if(leftSide instanceof Primary && ((Primary) leftSide).getChained() != null && ! (((Primary) leftSide).getLastChained() instanceof ChainedAttribute))
+            throw new SemanticException("Invalid left side", ((Primary) leftSide).getChained().getToken());
+        if((leftSide instanceof AttributeAccessNode || leftSide instanceof VarAccessNode) && ! rightSide.getType().conforms(leftSide.getType())){
+            throw new SemanticException("Right side has invalid type", new TokenImpl(Token.TokenType.PUBLIC_WORD,"placeholder",-1));
+        }
+
     }
 
     @Override

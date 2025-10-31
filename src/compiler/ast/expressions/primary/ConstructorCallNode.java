@@ -28,8 +28,8 @@ public class ConstructorCallNode extends Primary{
             arg.print(i+1);
         }
 
-        if(chain != null){
-            chain.print(i+1);
+        if(chained != null){
+            chained.print(i+1);
         }
     }
 

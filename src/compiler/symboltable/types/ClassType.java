@@ -2,6 +2,8 @@ package compiler.symboltable.types;
 
 import compiler.token.Token;
 
+import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
+
 public class ClassType extends Type{
     Token genericType;
 
@@ -21,5 +23,17 @@ public class ClassType extends Type{
     @Override
     public Token getGenericTypeToken() {
         return genericType;
+    }
+
+    @Override
+    public boolean conforms(Type t){
+        if(t.getName().equals(this.getName()) || t.getName().equals("Object"))
+            return true;
+        var classEntry = symbolTable.getClassEntry(getName());
+        var found = false;
+        if(t instanceof ClassType)
+            while(!classEntry.getParent().getLexeme().equals("Object") && ! found)
+                classEntry = symbolTable.getClassEntry(classEntry.getParent().getLexeme());
+        return found;
     }
 }

@@ -1,9 +1,12 @@
 package compiler.symboltable;
 
+import compiler.ast.expressions.ExpressionNode;
 import compiler.exceptions.SemanticException;
 import compiler.token.Token;
 
 import java.util.Map;
+
+import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
 
 public abstract class TopLevelEntry {
     protected String name;
@@ -41,5 +44,24 @@ public abstract class TopLevelEntry {
 
     public abstract void consolidate() throws SemanticException;
 
+    public MethodEntry getMethod(String arityAndName) {
+        return methods.get(arityAndName);
+    }
 
+
+    public boolean hasAttribute(String name) {
+        var currentClass = symbolTable.getCurrentClass();
+        while(! attributes.containsKey(currentClass.getName()+name) && ! currentClass.getName().equals("Object")){
+            currentClass = symbolTable.getClassEntry(currentClass.getParent());
+        }
+        return attributes.containsKey(currentClass.getName()+name);
+    }
+
+    public AttributeEntry getAttribute(String name) {
+        var currentClass = symbolTable.getCurrentClass();
+        while(! attributes.containsKey(currentClass.getName()+name) && ! currentClass.getName().equals("Object")){
+            currentClass = symbolTable.getClassEntry(currentClass.getParent());
+        }
+        return attributes.get(currentClass.getName()+name);
+    }
 }

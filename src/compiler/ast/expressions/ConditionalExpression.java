@@ -1,6 +1,9 @@
 package compiler.ast.expressions;
 
+import compiler.exceptions.SemanticException;
 import compiler.symboltable.types.Type;
+import compiler.token.Token;
+import compiler.token.TokenImpl;
 
 public class ConditionalExpression extends ExpressionNode {
     ExpressionNode condition;
@@ -20,8 +23,20 @@ public class ConditionalExpression extends ExpressionNode {
     }
 
     @Override
-    public void check() {
-        //TODO
+    public void check() throws SemanticException {
+        condition.check();
+        if(!condition.getType().getName().equals("boolean"))
+            throw new SemanticException("Condition must be boolean", new TokenImpl(Token.TokenType.PUBLIC_WORD, "placeholder", -1)); //TODO change token
+
+        trueExpression.check();
+        falseExpression.check();
+
+        if(trueExpression.getType().getName().equals("void") || falseExpression.getType().getName().equals("void"))
+            throw new SemanticException("Expression expected", new TokenImpl(Token.TokenType.PUBLIC_WORD, "placeholder", -1));
+        if(! trueExpression.getType().getName().equals(falseExpression.getType().getName()))
+            throw new SemanticException("Result of conditional expressions must have the same type", new TokenImpl(Token.TokenType.PUBLIC_WORD, "placeholder", -1)); //TODO change token
+
+
     }
 
     @Override

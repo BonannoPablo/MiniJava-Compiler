@@ -16,4 +16,8 @@ public class PrimitiveType extends Type{
         return null;
     }
 
+    @Override
+    public boolean conforms(Type t){
+        return t.getName().equals(this.getName());
+    }
 }

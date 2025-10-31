@@ -42,4 +42,8 @@ public class AttributeEntry {
     public Token getToken() {
         return token;
     }
+
+    public Type getType() {
+        return type;
+    }
 }

@@ -28,4 +28,6 @@ public abstract class Type {
     }
 
     public abstract Token getGenericTypeToken() ;
+
+    public abstract boolean conforms(Type t);
 }

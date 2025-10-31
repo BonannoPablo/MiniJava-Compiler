@@ -1013,10 +1013,10 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
             methodCall.addArguments(args);
             return methodCall;
         }else{
-            if(symbolTable.getCurrentBlock().containsLocalVar(tk.getLexeme()))
+            if(symbolTable.getCurrentBlock().containsLocalVar(tk.getLexeme()) || symbolTable.getCurrentMethod().hasParameter(tk.getLexeme()) )
                 return new VarAccessNode(tk);
             else
-                throw new SemanticException("Can't find symbol", tk);
+                return new AttributeAccessNode(tk);
         }
     }
 
@@ -1092,7 +1092,9 @@ public class SyntacticAnalyzerImpl implements SyntacticAnalyzer {
         match(Token.TokenType.METVARID);
         var args = optionalActualArgs();
         if(args != null){ //It's a method call
-            return new ChainedCall(metVar);
+            var exp = new MethodCallExpression(metVar);
+            exp.addArguments(args);
+            return new ChainedCall(metVar, exp);
         } else { //It's attribute access
             return new ChainedAttribute(metVar);
         }

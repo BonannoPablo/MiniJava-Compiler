@@ -3,6 +3,8 @@ package compiler.ast.sentences;
 import compiler.ast.expressions.ExpressionNode;
 import compiler.exceptions.SemanticException;
 
+import static compiler.syntacticanalyzer.SyntacticAnalyzerImpl.symbolTable;
+
 public class StaticCallSentenceNode extends SentenceNode {
     ExpressionNode expression;
 
@@ -18,6 +20,6 @@ public class StaticCallSentenceNode extends SentenceNode {
 
     @Override
     public void check() throws SemanticException {
-        //TODO
+        expression.check();
     }
 }

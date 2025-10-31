@@ -1,5 +1,7 @@
 package compiler.ast.expressions;
 
+import compiler.exceptions.SemanticException;
+import compiler.symboltable.types.PrimitiveType;
 import compiler.symboltable.types.Type;
 import compiler.token.Token;
 
@@ -20,12 +22,29 @@ public class UnaryExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void check() {
-        //TODO
+    public void check() throws SemanticException {
+        expression.check();
+        var expressionType = expression.getType().getName();
+        switch (unaryOperator.getTokenType()){
+            case PLUS:
+            case MINUS:
+            case PLUS1:
+            case MINUS1:{
+                if(! expressionType.equals("int"))
+                    throw new SemanticException("Invalid type for operator " + unaryOperator.getLexeme(), unaryOperator);
+                break;
+            }
+            case EXCLAMATION_POINT:
+                if(! expressionType.equals("boolean"))
+                    throw new SemanticException("Invalid type for operator " + unaryOperator.getLexeme(), unaryOperator);
+        }
     }
 
     @Override
     public Type getType() {
-        return null;
+        if(unaryOperator.getTokenType() == Token.TokenType.EXCLAMATION_POINT)
+            return new PrimitiveType( "boolean");
+        else
+            return new PrimitiveType("int");
     }
 }

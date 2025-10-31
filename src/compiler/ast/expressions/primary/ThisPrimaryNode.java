@@ -9,8 +9,8 @@ public class ThisPrimaryNode extends Primary{
     public void print(int i) {
         System.out.println(" ".repeat(i)+"THIS PRIMARY NODE");
 
-        if(chain != null){
-            chain.print(i+1);
+        if(chained != null){
+            chained.print(i+1);
         }
     }
 
