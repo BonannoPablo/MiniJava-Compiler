@@ -62,6 +62,6 @@ public class StaticCallExpressionNode extends Primary{
 
     @Override
     public Type getType() {
-        return null;
+        return symbolTable.getClassEntry(classCalledName).getMethod(arguments.size() +  methodCalledToken.getLexeme()).getReturnType();
     }
 }

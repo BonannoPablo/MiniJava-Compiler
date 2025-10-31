@@ -164,6 +164,14 @@ public class MethodEntry{
         return parametersNames.contains(name);
     }
 
+    public ParameterEntry getParameter(String name) {
+        for(ParameterEntry parameter : parameters) {
+            if(parameter.getName().equals(name))
+                return parameter;
+        }
+        return null;
+    }
+
     public void checkSentences() throws SemanticException {
         if(block!= null)
             block.check();

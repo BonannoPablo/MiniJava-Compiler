@@ -18,7 +18,7 @@ public class VarAccessNode extends Primary{
     @Override
     public void print(int i) {
         System.out.println(" ".repeat(i)+"VAR ACCESS NODE");
-        System.out.println(" ".repeat(i)+"VarName: " + varToken.getLexeme());
+        System.out.println(" ".repeat(i)+"VarName: " + name);
 
         if(chained != null){
             chained.print(i+1);
@@ -27,11 +27,15 @@ public class VarAccessNode extends Primary{
 
     @Override
     public void check() {
-        //TODO
+        //TODO check chains
     }
 
     @Override
     public Type getType() {
-        return symbolTable.getCurrentBlock().getVariable(varToken.getLexeme()).getType();
+        var variable = symbolTable.getCurrentBlock().getVariable(name);
+        if(variable != null)
+            return variable.getType();
+        else
+            return symbolTable.getCurrentMethod().getParameter(name).getType();
     }
 }

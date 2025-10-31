@@ -1,6 +1,7 @@
 package compiler.ast.expressions.primary;
 
 import compiler.ast.expressions.ExpressionNode;
+import compiler.exceptions.SemanticException;
 import compiler.symboltable.types.Type;
 
 public class PrimaryExpression extends Primary{
@@ -21,12 +22,12 @@ public class PrimaryExpression extends Primary{
     }
 
     @Override
-    public void check() {
-        //TODO
+    public void check() throws SemanticException {
+        expression.check();
     }
 
     @Override
     public Type getType() {
-        return null;
+        return expression.getType();
     }
 }
